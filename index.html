@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>APPIKA — Professional App Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #060910;
+  --bg-2: #0A0F1A;
+  --surface: #0F1623;
+  --surface-2: #151E2E;
+  --surface-3: #1C2740;
+  --border: rgba(99,179,255,0.10);
+  --border-hi: rgba(99,179,255,0.25);
+  --accent: #4F8EF7;
+  --accent-2: #A855F7;
+  --accent-3: #06B6D4;
+  --accent-4: #EC4899;
+  --gold: #F59E0B;
+  --green: #10B981;
+  --red: #EF4444;
+  --text: #E8F0FF;
+  --text-dim: #A8B8D0;
+  --muted: #6B84A8;
+  --card-bg: rgba(15,22,35,0.85);
+  --glow: rgba(79,142,247,0.18);
+  --sidebar-w: 300px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,142,247,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(168,85,247,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(6,9,16,0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+}
+.header-inner {
+  max-width: 1500px; margin: 0 auto;
+  display: flex; align-items: center; gap: 24px; height: 74px;
+}
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
+.logo-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 0 24px rgba(79,142,247,0.5);
+}
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700;
+  letter-spacing: -0.8px; display: flex; align-items: baseline;
+}
+.logo-text .dev { color: var(--text); }
+.logo-text .store {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent), var(--accent-2));
+  background-size: 300% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmer 4s linear infinite; font-weight: 700;
+}
+@keyframes shimmer { to { background-position: 300% center; } }
+.search-wrap {
+  width: 400px;
+  max-width: 400px;
+  position: relative;
+  margin-left: auto;
+}
+.search-wrap input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 11px 22px 11px 48px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
+  transition: all 0.25s;
+}
+.search-wrap input::placeholder { color: var(--muted); }
+.search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(79,142,247,0.12);
+  background: var(--surface-2);
+}
+.search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 16px; pointer-events: none;
+}
+.header-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+.nav-tabs {
+  background: rgba(10,15,26,0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  position: sticky; top: 74px; z-index: 99;
+}
+.tabs-inner {
+  max-width: 1500px; margin: 0 auto;
+  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+}
+.tabs-inner::-webkit-scrollbar { display: none; }
+.tab-btn {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  padding: 16px 22px; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; transition: all 0.25s;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-count {
+  background: var(--surface-2); color: var(--muted);
+  font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 700;
+}
+.tab-btn.active .tab-count { background: rgba(79,142,247,0.2); color: var(--accent); }
+.hero-banner { max-width: 1500px; margin: 32px auto 0; padding: 0 32px; position: relative; z-index: 1; }
+.hero-inner {
+  background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(168,85,247,0.10), rgba(6,182,212,0.08));
+  border: 1px solid var(--border-hi);
+  border-radius: 24px; padding: 40px 48px;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.3);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 16px;
+}
+.hero-badge .pulse {
+  width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+.hero-title {
+  font-size: 38px; font-weight: 900; line-height: 1.15;
+  margin-bottom: 10px; letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--accent) 70%, var(--accent-2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-subtitle { font-size: 15px; color: var(--text-dim); line-height: 1.7; max-width: 520px; }
+.hero-stats { display: flex; gap: 32px; position: relative; z-index: 1; }
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat .lbl {
+  font-size: 12px; color: var(--muted); margin-top: 4px;
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+}
+.layout {
+  max-width: 1500px; margin: 0 auto; padding: 32px;
+  display: grid; grid-template-columns: 1fr var(--sidebar-w);
+  gap: 32px; position: relative; z-index: 1;
+}
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+}
+.section-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+.section-title .count-pill {
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--muted); font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: 20px;
+}
+.sort-wrap { display: flex; align-items: center; gap: 8px; }
+.sort-label { font-size: 13px; color: var(--muted); }
+.sort-select {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  padding: 8px 14px; outline: none; cursor: pointer; transition: all 0.25s;
+}
+.sort-select:focus { border-color: var(--accent); }
+option { background: var(--surface-2); color: var(--text); }
+.featured-section { margin-bottom: 32px; }
+.featured-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 700; color: var(--gold); margin-bottom: 14px;
+}
+.featured-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+}
+.featured-card {
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--border-hi);
+  border-radius: 18px; padding: 18px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.featured-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245,158,11,0.4);
+  box-shadow: 0 16px 40px rgba(245,158,11,0.15);
+}
+.featured-icon {
+  width: 56px; height: 56px; border-radius: 14px; overflow: hidden;
+  flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.featured-info { flex: 1; min-width: 0; }
+.featured-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.featured-meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.featured-meta .star { color: var(--gold); }
+.apps-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px;
+}
+.app-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden; cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column;
+  animation: cardIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.app-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--border-hi);
+  box-shadow: 0 24px 60px rgba(79,142,247,0.15), 0 0 0 1px rgba(79,142,247,0.15);
+}
+.card-img-wrap {
+  width: 100%; aspect-ratio: 16/10;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  overflow: hidden; position: relative;
+}
+.card-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.app-card:hover .card-img-wrap img { transform: scale(1.08); }
+.card-cat-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(6,9,16,0.8); backdrop-filter: blur(12px);
+  border: 1px solid var(--border-hi); border-radius: 8px;
+  padding: 4px 10px; font-size: 11px; color: var(--accent-3); font-weight: 700;
+}
+.card-body {
+  padding: 16px 18px 18px; flex: 1;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.card-name {
+  font-size: 16px; font-weight: 800; color: var(--text);
+  line-height: 1.3; letter-spacing: -0.3px;
+}
+.card-desc {
+  font-size: 12.5px; color: var(--muted); line-height: 1.7; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px; gap: 8px; flex-wrap: wrap;
+}
+.card-rating {
+  display: flex; align-items: center; gap: 5px;
+  color: var(--gold); font-size: 13px; font-weight: 800;
+  flex-wrap: wrap;
+}
+.card-rating .reviews { color: var(--muted); font-size: 11px; font-weight: 400; }
+.card-rating .card-sep { color: var(--muted); opacity: 0.5; font-size: 10px; margin: 0 1px; }
+.card-rating .card-dl {
+  display: inline-flex; align-items: center; gap: 3px;
+  color: var(--text-dim); font-size: 11px; font-weight: 600;
+}
+.card-rating .card-dl .dl-icon { font-size: 10px; color: var(--accent-3); }
+.btn-download {
+  background: linear-gradient(135deg, var(--accent), #2ceb25);
+  color: white; border: none; border-radius: 10px;
+  padding: 8px 16px; font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.25s; box-shadow: 0 4px 14px rgba(79,142,247,0.3);
+  flex-shrink: 0;
+}
+.btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22, 100, 35, 0.5); }
+.btn-download.open-btn {
+  background: linear-gradient(135deg, var(--accent-3), var(--accent));
+  box-shadow: 0 4px 14px rgba(6,182,212,0.35);
+}
+.btn-download.open-btn:hover { box-shadow: 0 8px 24px rgba(6,182,212,0.55); }
+.sidebar { display: flex; flex-direction: column; gap: 24px; }
+.sidebar-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 20px; padding: 22px;
+}
+.sidebar-title {
+  font-size: 15px; font-weight: 800; color: var(--text);
+  margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+.sidebar-title .icon { color: var(--accent); font-size: 18px; }
+.top-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 8px; border-radius: 12px; cursor: pointer; transition: all 0.25s;
+}
+.top-item:hover { background: rgba(79,142,247,0.06); transform: translateX(4px); }
+.top-rank {
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+  color: var(--muted); width: 22px; flex-shrink: 0; text-align: center;
+}
+.top-rank.gold { color: var(--gold); text-shadow: 0 0 12px rgba(245,158,11,0.5); }
+.top-rank.silver { color: #9CA3AF; }
+.top-rank.bronze { color: #CD7F32; }
+.top-img {
+  width: 44px; height: 44px; border-radius: 12px;
+  object-fit: cover; background: var(--surface-2); flex-shrink: 0;
+  overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.top-info { flex: 1; min-width: 0; }
+.top-name {
+  font-size: 13px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.top-dl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.top-dl .num { color: var(--accent-3); font-weight: 700; }
+.btn-more {
+  width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--muted);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 11px; cursor: pointer; margin-top: 14px; transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-more:hover {
+  background: rgba(79,142,247,0.1); color: var(--accent);
+  border-color: var(--border-hi);
+}
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--muted); }
+.stat-val {
+  font-weight: 800; color: var(--accent);
+  font-family: 'Space Grotesk', sans-serif;
+}
+.tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-chip {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; color: var(--muted); cursor: pointer;
+  transition: all 0.25s; font-weight: 600;
+}
+.tag-chip:hover {
+  background: rgba(79,142,247,0.12); color: var(--accent);
+  border-color: var(--border-hi); transform: translateY(-2px);
+}
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,9,16,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 200; display: none; overflow-y: auto;
+  animation: fadeIn 0.3s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-overlay.open { display: block; }
+.modal-content {
+  max-width: 1200px; margin: 40px auto; padding: 0 24px 80px;
+  animation: modalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-back {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  padding: 10px 18px; border-radius: 12px; margin-bottom: 24px;
+  transition: all 0.25s;
+}
+.modal-back:hover {
+  color: var(--accent); border-color: var(--border-hi); background: var(--surface-2);
+}
+.modal-grid {
+  display: grid; grid-template-columns: 1fr var(--sidebar-w); gap: 32px;
+}
+.modal-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px; overflow: hidden; margin-bottom: 24px;
+}
+.modal-hero-cover {
+  width: 100%; height: 320px;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  overflow: hidden; position: relative;
+}
+.modal-hero-cover img { width: 100%; height: 100%; object-fit: cover; }
+.modal-hero-cover::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(15,22,35,0.95), transparent 60%);
+}
+.modal-hero-body { padding: 0 32px 32px; position: relative; }
+.modal-app-header {
+  display: flex; align-items: flex-end; gap: 20px;
+  margin-top: -60px; margin-bottom: 24px; position: relative; z-index: 1;
+}
+.modal-app-icon {
+  width: 110px; height: 110px; border-radius: 24px;
+  object-fit: cover; background: var(--surface-2); flex-shrink: 0;
+  border: 3px solid var(--surface);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px var(--glow);
+  overflow: hidden;
+}
+.modal-app-info { flex: 1; padding-bottom: 6px; }
+.modal-app-name {
+  font-size: 30px; font-weight: 900; line-height: 1.2;
+  margin-bottom: 6px; letter-spacing: -0.5px;
+}
+.modal-app-dev { color: var(--accent); font-size: 14px; margin-bottom: 12px; font-weight: 600; }
+.modal-app-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.meta-badge {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 5px 14px;
+  font-size: 12px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px; font-weight: 600;
+}
+.meta-badge .ic { color: var(--accent); }
+.modal-rating-row {
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 24px; padding: 20px;
+  background: var(--surface-2); border-radius: 16px; border: 1px solid var(--border);
+}
+.big-rating {
+  font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700;
+  color: var(--gold); line-height: 1; text-shadow: 0 0 30px rgba(245,158,11,0.3);
+}
+.stars { font-size: 20px; color: var(--gold); letter-spacing: 2px; }
+.rating-count { color: var(--muted); font-size: 13px; margin-top: 6px; }
+.btn-dl-big {
+  background: linear-gradient(135deg, var(--accent), #25eb25);
+  color: white; border: none; border-radius: 16px;
+  padding: 18px 32px; font-family: 'Inter', sans-serif;
+  font-size: 17px; font-weight: 800; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 10px 40px rgba(79,142,247,0.4);
+  transition: all 0.3s; width: 100%; justify-content: center;
+}
+.btn-dl-big:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(93, 102, 94, 0.55); }
+.btn-dl-big.open-btn {
+  background: linear-gradient(135deg, var(--accent-3), var(--accent));
+  box-shadow: 0 10px 40px rgba(6,182,212,0.4);
+}
+.btn-dl-big.open-btn:hover { box-shadow: 0 16px 50px rgba(6,182,212,0.6); }
+.modal-section-title {
+  font-size: 16px; font-weight: 800; color: var(--text);
+  margin: 28px 0 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.modal-desc { font-size: 14.5px; line-height: 2; color: var(--text-dim); white-space: pre-line; }
+.modal-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.modal-tag {
+  background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 20px; padding: 6px 16px;
+  font-size: 12px; color: var(--accent); font-weight: 700; transition: all 0.25s;
+}
+.modal-tag:hover { background: rgba(79,142,247,0.2); transform: translateY(-2px); }
+.empty-state {
+  text-align: center; padding: 80px 20px; color: var(--muted);
+}
+.empty-state .emoji { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { font-size: 16px; font-weight: 600; }
+#no-results { display: none; }
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px 28px; font-size: 14px; font-weight: 700;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 999;
+  opacity: 0; pointer-events: none; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 90vw;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(16,185,129,0.4); color: var(--green); }
+.toast.error { border-color: rgba(239,68,68,0.4); color: var(--red); }
+.review-box {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+.review-field-label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; }
+.review-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 13px; outline: none;
+}
+.review-input:focus { border-color: var(--accent); }
+.star-picker { display: flex; gap: 4px; }
+.star-pick {
+  font-size: 26px; color: var(--gold); cursor: pointer;
+  user-select: none; line-height: 1; transition: transform 0.15s;
+}
+.star-pick:hover { transform: scale(1.15); }
+.btn-submit-review {
+  background: linear-gradient(135deg, var(--accent), #f8930f); color: #f5f5f5; border: none;
+  border-radius: 12px; padding: 12px 26px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all 0.25s;
+}
+.btn-submit-review:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(172, 125, 65, 0.4); }
+.user-review-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+}
+.user-review-card .rv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 10px; }
+.user-review-card .rv-name { font-size: 13px; font-weight: 700; }
+.user-review-card .rv-stars { color: var(--gold); font-size: 12px; white-space: nowrap; }
+.user-review-card .rv-comment { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.user-review-card .rv-date { font-size: 11px; color: var(--muted); margin-top: 4px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+@media (max-width: 1024px) {
+  .hero-stats { display: none; }
+  .hero-title { font-size: 28px; }
+}
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .modal-grid { grid-template-columns: 1fr; }
+  header { padding: 0 16px; }
+  .header-inner { height: 64px; gap: 12px; }
+  .logo-text { font-size: 20px; }
+  .nav-tabs { padding: 0 16px; top: 64px; }
+  .layout { padding: 20px 16px; }
+  .hero-banner { padding: 0 16px; margin-top: 20px; }
+  .hero-inner { padding: 24px; flex-direction: column; text-align: center; }
+  .hero-title { font-size: 24px; }
+  .modal-content { margin: 20px auto; padding: 0 16px 40px; }
+  .modal-app-header { flex-direction: column; align-items: center; text-align: center; }
+  .modal-app-name { font-size: 24px; }
+  .modal-hero-body { padding: 0 20px 24px; }
+  .modal-rating-row { flex-direction: column; text-align: center; }
+}
+@media (max-width: 480px) {
+  .apps-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card-body { padding: 12px; }
+  .card-name { font-size: 13px; }
+  .card-desc { font-size: 11px; }
+  .btn-download { padding: 6px 10px; font-size: 11px; }
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.site-footer {
+  position: relative; z-index: 1;
+  margin-top: 48px;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+}
+.footer-inner { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
+}
+.footer-brand .f-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.footer-brand .f-logo img { width: 40px; height: 40px; object-fit: contain; }
+.footer-brand .f-logo span {
+  font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.6px;
+}
+.footer-brand .f-logo b {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.footer-brand p { font-size: 13px; color: var(--muted); line-height: 1.8; max-width: 320px; margin-bottom: 20px; }
+.footer-social { display: flex; gap: 10px; }
+.footer-social a {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); transition: all 0.25s;
+}
+.footer-social a:hover {
+  color: var(--accent); border-color: var(--border-hi);
+  background: var(--surface-2); transform: translateY(-3px);
+}
+.footer-social svg { width: 18px; height: 18px; fill: currentColor; }
+.footer-col h4 {
+  font-size: 13px; font-weight: 800; color: var(--text);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.footer-col a {
+  font-size: 13.5px; color: var(--muted); text-decoration: none; cursor: pointer;
+  transition: all 0.2s; display: inline-block;
+}
+.footer-col a:hover { color: var(--accent); transform: translateX(3px); }
+
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 22px 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
+.footer-legal { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.footer-legal a {
+  font-size: 12.5px; color: var(--muted); text-decoration: none; transition: color 0.2s; cursor: pointer;
+}
+.footer-legal a:hover { color: var(--text); }
+.footer-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.footer-lang {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+  border-radius: 10px; padding: 8px 12px; font-family: 'Inter', sans-serif;
+  font-size: 12.5px; outline: none; cursor: pointer;
+}
+.footer-lang:focus { border-color: var(--accent); }
+.footer-copy { font-size: 12.5px; color: var(--muted); }
+.footer-copy b { color: var(--text-dim); font-weight: 700; }
+.back-top {
+  width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-dim); cursor: pointer; font-size: 16px;
+  transition: all 0.25s;
+}
+.back-top:hover { color: var(--accent); border-color: var(--border-hi); transform: translateY(-3px); }
+
+@media (max-width: 900px) {
+  .footer-inner { padding: 36px 16px 0; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .footer-top { grid-template-columns: 1fr 1fr; }
+}
+
+/* بادج نوع التطبيق */
+.card-cat-badge.link-badge {
+  background: rgba(6,182,212,0.85);
+  color: #fff;
+  border-color: rgba(6,182,212,0.5);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">
+        <img src="logo.png" alt="Logo">
+      </div>
+      <div class="logo-text">
+        <span class="dev">APP</span><span class="store">IKA</span>
+      </div>
+    </a>
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Search for apps, games, or categories…">
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+</header>
+
+<div class="nav-tabs">
+  <div class="tabs-inner">
+    <button class="tab-btn active" data-cat="all"><span class="tab-icon">🏠</span> All <span class="tab-count" id="cnt-all">0</span></button>
+    <button class="tab-btn" data-cat="mobile"><span class="tab-icon">📱</span> Mobile Apps <span class="tab-count" id="cnt-mobile">0</span></button>
+    <button class="tab-btn" data-cat="desktop"><span class="tab-icon">💻</span> Desktop Apps <span class="tab-count" id="cnt-desktop">0</span></button>
+    <button class="tab-btn" data-cat="android-game"><span class="tab-icon">🎮</span> Android Games <span class="tab-count" id="cnt-android-game">0</span></button>
+    <button class="tab-btn" data-cat="html-game"><span class="tab-icon">🌐</span> HTML Games <span class="tab-count" id="cnt-html-game">0</span></button>
+    <button class="tab-btn" data-cat="new"><span class="tab-icon">✨</span> Newest</button>
+    <button class="tab-btn" data-cat="top"><span class="tab-icon">🔥</span> Top Rated</button>
+  </div>
+</div>
+
+<div class="hero-banner">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge"><span class="pulse"></span> Professional App Store</div>
+      <h1 class="hero-title">Discover Apps & Games<br>Crafted by APPIKA-Studio</h1>
+      <p class="hero-subtitle">An exclusive collection of high-quality apps and games, meticulously designed for an exceptional user experience.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="hero-total">0</div><div class="lbl">Apps</div></div>
+      <div class="hero-stat"><div class="num" id="hero-downloads">0</div><div class="lbl">Downloads</div></div>
+      <div class="hero-stat"><div class="num" id="hero-rating">0</div><div class="lbl">Avg Rating</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main-area">
+    <div class="featured-section" id="featured-section" style="display:none;">
+      <div class="featured-title"><span>⭐</span> Featured Apps</div>
+      <div class="featured-grid" id="featured-grid"></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title" id="section-label">All Apps <span class="count-pill" id="app-count-label">0</span></div>
+      <div class="sort-wrap">
+        <span class="sort-label">Sort by:</span>
+        <select class="sort-select" id="sort-select">
+          <option value="downloads">Most Downloaded</option>
+          <option value="rating">Highest Rated</option>
+          <option value="name">Name</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="apps-grid" id="apps-grid"></div>
+
+    <div class="empty-state" id="no-results">
+      <div class="emoji">📦</div>
+    </div>
+  </div>
+
+  <aside class="sidebar" id="main-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title"><span class="icon">🔥</span> Top Downloads</div>
+      <div id="top-list"></div>
+      <button class="btn-more" onclick="document.querySelector('[data-cat=all]').click()">View All →</button>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title"><span class="icon">📊</span> Store Statistics</div>
+      <div id="store-stats"></div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title"><span class="icon">🏷️</span> Popular Tags</div>
+      <div class="tags-cloud" id="tags-cloud"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-back" onclick="closeModal()">← Back to Store</button>
+    <div class="modal-grid">
+      <div class="modal-main" id="modal-main"></div>
+      <aside class="sidebar" id="modal-sidebar"></aside>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="f-logo">
+          <img src="logo.png" alt="APPIKA" onerror="this.style.display='none'">
+          <span>APP<b>IKA</b></span>
+        </div>
+        <p>Your professional store for high-quality apps and games, crafted by APPIKA-Studio for an exceptional experience.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M13.5 22v-8h2.7l.5-3.3h-3.2V8.6c0-.9.4-1.7 1.8-1.7h1.5V4.1S15.5 3.9 14.3 3.9c-2.6 0-4.3 1.6-4.3 4.4v2.4H7.3V14H10v8h3.5z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.2-3.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>
+          </a>
+          <a href="#" aria-label="YouTube" title="YouTube">
+            <svg viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3-5.2 3z"/></svg>
+          </a>
+          <a href="#" aria-label="GitHub" title="GitHub">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.300.1-2.700 0 0 .8-.3 2.800 1a9.600 9.600 0 0 1 5 0c1.900-1.300 2.800-1 2.800-1 .5 1.400.2 2.400.1 2.700.6.7 1 1.600 1 2.700 0 3.900-2.400 4.700-4.600 5 .4.3.7.9.7 1.900v2.800c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Store</h4>
+        <ul>
+          <li><a data-goto="all">All Apps</a></li>
+          <li><a data-goto="new">Newest</a></li>
+          <li><a data-goto="top">Top Rated</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <ul>
+          <li><a data-goto="mobile">Mobile Apps</a></li>
+          <li><a data-goto="desktop">Desktop Apps</a></li>
+          <li><a data-goto="android-game">Android Games</a></li>
+          <li><a data-goto="html-game">HTML Games</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="pages.html#help">Help Center</a></li>
+          <li><a href="pages.html#contact">Contact Us</a></li>
+          <li><a href="pages.html#report">Report a Problem</a></li>
+          <li><a href="pages.html#developers">Developers</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-legal">
+        <a href="pages.html#terms">Terms of Service</a>
+        <a href="pages.html#privacy">Privacy</a>
+        <a href="pages.html#cookies">Cookies</a>
+        <a href="pages.html#about">About APPIKA</a>
+      </div>
+      <div class="footer-right">
+        <select class="footer-lang" aria-label="Language">
+          <option>🌐 English</option>
+
+        </select>
+        <span class="footer-copy">© <span id="footer-year"></span> <b>APPIKA-Studio</b>. All rights reserved.</span>
+        <button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allApps = [];
+let selectedStars = {};
+
+/* ─── حماية الأرقام ─── */
+function safeNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function fmtK(n) {
+  const v = safeNum(n);
+  if (v >= 1000000) return (v/1000000).toFixed(1) + 'M';
+  if (v >= 1000) return (v/1000).toFixed(1) + 'K';
+  return String(v);
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.classList.remove('show'); }, 3000);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+function getDefaultExt(cat) {
+  if (cat === 'desktop') return '.exe';
+  if (cat === 'html-game') return '.html';
+  return '.apk';
+}
+
+/* ─── هل هذا التطبيق من نوع رابط؟ ─── */
+function isLinkApp(app) {
+  return app && (app.category === 'html-game' || app.category === 'desktop' || app.isLink === true);
+}
+
+function getDownloadFileName(app) {
+  if (isLinkApp(app)) return '';
+  if (app.apk && app.apk.startsWith('data:')) {
+    return app.apkFileName || (app.name.toLowerCase().replace(/\s+/g,'-') + getDefaultExt(app.category));
+  }
+  const fromPath = (app.apk || '').split('/').pop();
+  return fromPath || (app.name.toLowerCase().replace(/\s+/g,'-') + getDefaultExt(app.category));
+}
+
+let currentCat = 'all';
+let currentSearch = '';
+let currentSort = 'downloads';
+
+async function loadApps() {
+  try {
+    const r = await fetch('/api/apps', { cache: 'no-store' });
+    const data = await r.json();
+    allApps = (data.apps || []).map(a => ({
+      ...a,
+      downloads: safeNum(a.downloads),
+      rating: safeNum(a.rating),
+      reviews: safeNum(a.reviews)
+    }));
+  } catch(e) {
+    console.warn('Could not load apps', e);
+    allApps = [];
+  }
+  updateCounts();
+  updateHero();
+  render();
+  renderSidebar();
+}
+
+function getCatLabel(cat) {
+  const labels = {
+    mobile: 'Mobile Apps',
+    desktop: 'Desktop Apps',
+    'android-game': 'Android Games',
+    'html-game': 'HTML Games'
+  };
+  return labels[cat] || cat;
+}
+
+function updateCounts() {
+  const cats = ['mobile','desktop','android-game','html-game'];
+  document.getElementById('cnt-all').textContent = allApps.length;
+  cats.forEach(c => {
+    const el = document.getElementById('cnt-' + c);
+    if(el) el.textContent = allApps.filter(a => a.category === c).length;
+  });
+}
+
+function updateHero() {
+  document.getElementById('hero-total').textContent = allApps.length;
+  const totalDL = allApps.reduce((s,a) => s + safeNum(a.downloads), 0);
+  document.getElementById('hero-downloads').textContent = fmtK(totalDL) + '+';
+  const avg = allApps.length
+    ? (allApps.reduce((s,a) => s + safeNum(a.rating), 0) / allApps.length).toFixed(1)
+    : '0';
+  document.getElementById('hero-rating').textContent = avg;
+}
+
+function getFiltered() {
+  let apps = [...allApps];
+  if(currentCat === 'new') {
+    apps = [...allApps].sort((a,b) => safeNum(b.id) - safeNum(a.id)).slice(0,8);
+  } else if(currentCat === 'top') {
+    apps = [...allApps].sort((a,b) => safeNum(b.rating) - safeNum(a.rating)).slice(0,8);
+  } else if(currentCat !== 'all') {
+    apps = apps.filter(a => a.category === currentCat);
+  }
+  if(currentSearch) {
+    const q = currentSearch.toLowerCase();
+    apps = apps.filter(a =>
+      (a.name||'').toLowerCase().includes(q) ||
+      (a.description||'').toLowerCase().includes(q) ||
+      (a.tags||[]).some(t => t.toLowerCase().includes(q))
+    );
+  }
+  if(currentSort === 'downloads') apps.sort((a,b) => safeNum(b.downloads) - safeNum(a.downloads));
+  else if(currentSort === 'rating') apps.sort((a,b) => safeNum(b.rating) - safeNum(a.rating));
+  else if(currentSort === 'name') apps.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  else if(currentSort === 'newest') apps.sort((a,b) => safeNum(b.id) - safeNum(a.id));
+  return apps;
+}
+
+function renderStars(r) {
+  r = safeNum(r);
+  const full = Math.floor(r);
+  const half = r - full >= 0.5;
+  let s = '';
+  for(let i=0;i<5;i++) {
+    if(i < full) s += '★';
+    else if(i === full && half) s += '⯨';
+    else s += '☆';
+  }
+  return s;
+}
+
+function getAppIcon(app, size = 'large') {
+  const colors = {
+    mobile: ['#4F8EF7','#2563EB'],
+    desktop: ['#A855F7','#7C3AED'],
+    'android-game': ['#06B6D4','#0891B2'],
+    'html-game': ['#F59E0B','#D97706']
+  };
+  const [c1,c2] = colors[app.category] || ['#4F8EF7','#2563EB'];
+  const icons = { mobile:'📱', desktop:'💻', 'android-game':'🎮', 'html-game':'🌐' };
+  const ic = icons[app.category] || '⚡';
+  const fs = size === 'small' ? '20px' : '52px';
+  const radius = size === 'small' ? '10px' : '0';
+  return `<div style="width:100%;height:100%;background:linear-gradient(135deg,${c1},${c2});display:flex;align-items:center;justify-content:center;font-size:${fs};border-radius:${radius};">${ic}</div>`;
+}
+
+function hasValidImage(app) {
+  return app.image && !app.image.startsWith('img/');
+}
+
+function renderFeatured() {
+  const featured = allApps.filter(a => a.featured).slice(0, 3);
+  const section = document.getElementById('featured-section');
+  const grid = document.getElementById('featured-grid');
+
+  if(!featured.length) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  grid.innerHTML = featured.map(app => `
+    <div class="featured-card" onclick="openApp(${app.id})">
+      <div class="featured-icon">
+        ${hasValidImage(app)
+          ? `<img src="${app.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='${getAppIcon(app, 'small').replace(/'/g, "\\'")}`
+          : getAppIcon(app, 'small')}
+      <div class="featured-info">
+        <div class="featured-name">${app.name}</div>
+        <div class="featured-meta">
+          <span class="star">★ ${safeNum(app.rating)}</span>
+          <span>·</span>
+          <span>${isLinkApp(app) ? '🔗 Link' : fmtK(safeNum(app.downloads)) + ' downloads'}</span>
+        </div>
+      </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function render() {
+  renderFeatured();
+  const apps = getFiltered();
+  const grid = document.getElementById('apps-grid');
+  const noRes = document.getElementById('no-results');
+  const label = document.getElementById('section-label');
+  const countLabel = document.getElementById('app-count-label');
+
+  const catNames = {
+    all: 'All Apps',
+    mobile: 'Mobile Apps',
+    desktop: 'Desktop Apps',
+    'android-game': 'Android Games',
+    'html-game': 'HTML Games',
+    new: 'Newest Apps',
+    top: 'Top Rated'
+  };
+
+  label.childNodes[0].textContent = catNames[currentCat] || currentCat;
+  countLabel.textContent = apps.length + ' apps';
+
+  if(!apps.length) {
+    grid.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  grid.innerHTML = apps.map((app, i) => {
+    const catLabel = getCatLabel(app.category);
+    const linkApp = isLinkApp(app);
+    return `
+    <div class="app-card" onclick="openApp(${app.id})" style="animation-delay:${i * 0.04}s">
+      <div class="card-img-wrap">
+        ${hasValidImage(app)
+          ? `<img src="${app.image}" alt="${app.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          : ''}
+        <div class="app-svg-icon" style="${hasValidImage(app)?'display:none':''};width:100%;height:100%;">
+          ${getAppIcon(app)}
+        </div>
+        <div class="card-cat-badge ${linkApp ? 'link-badge' : ''}">${linkApp ? '🔗 ' : ''}${catLabel}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${app.name}</div>
+        <div class="card-desc">${app.description}</div>
+        <div class="card-footer">
+          <div class="card-rating">
+            <span class="star-icon">⭐</span> ${safeNum(app.rating)}
+            <span class="reviews">(${safeNum(app.reviews).toLocaleString()})</span>
+            <span class="card-sep">•</span>
+            <span class="card-dl" title="${safeNum(app.downloads).toLocaleString()} downloads"><span class="dl-icon">⬇️</span> ${fmtK(safeNum(app.downloads))}</span>
+          </div>
+          <button class="btn-download ${linkApp ? 'open-btn' : ''}" onclick="event.stopPropagation();downloadApp(${app.id})">
+            ${linkApp ? '🔗 Open' : '⬇️ download'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSidebar() {
+  const top6 = [...allApps]
+    .sort((a,b) => safeNum(b.downloads) - safeNum(a.downloads))
+    .slice(0,6);
+  const rankClass = ['gold','silver','bronze','','',''];
+
+  document.getElementById('top-list').innerHTML = top6.map((app,i) => `
+    <div class="top-item" onclick="openApp(${app.id})">
+      <span class="top-rank ${rankClass[i]}">${i+1}</span>
+      <div class="top-img">
+        ${hasValidImage(app)
+          ? `<img src="${app.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='${getAppIcon(app, 'small').replace(/'/g, "\\'")}`
+          : getAppIcon(app, 'small')}
+      </div>
+      <div class="top-info">
+        <div class="top-name">${app.name}</div>
+        <div class="top-dl"><span class="num">${fmtK(safeNum(app.downloads))}</span> downloads</div>
+      </div>
+    </div>
+  `).join('');
+
+  const totalDL = allApps.reduce((s,a)=>s+safeNum(a.downloads),0);
+  const avgRating = allApps.length
+    ? (allApps.reduce((s,a)=>s+safeNum(a.rating),0)/allApps.length).toFixed(1)
+    : 0;
+  document.getElementById('store-stats').innerHTML = `
+    <div class="stat-row"><span class="stat-label">Total Apps</span><span class="stat-val">${allApps.length}</span></div>
+    <div class="stat-row"><span class="stat-label">Total Downloads</span><span class="stat-val">${fmtK(totalDL)}+</span></div>
+    <div class="stat-row"><span class="stat-label">Average Rating</span><span class="stat-val">⭐ ${avgRating}</span></div>
+    <div class="stat-row"><span class="stat-label">Developer</span><span class="stat-val">APPIKA-Studio</span></div>
+  `;
+
+  const allTags = allApps.flatMap(a => a.tags||[]);
+  const unique = [...new Set(allTags)];
+  document.getElementById('tags-cloud').innerHTML = unique.slice(0,14).map(t =>
+    `<span class="tag-chip" onclick="searchTag('${t}')">${t}</span>`
+  ).join('');
+}
+
+function renderModalSidebar(currentId) {
+  const top6 = [...allApps]
+    .sort((a,b) => safeNum(b.downloads) - safeNum(a.downloads))
+    .slice(0,6);
+  const rankClass = ['gold','silver','bronze','','',''];
+  document.getElementById('modal-sidebar').innerHTML = `
+    <div class="sidebar-card">
+      <div class="sidebar-title"><span class="icon">🔥</span> Top Downloads</div>
+      ${top6.map((app,i) => `
+        <div class="top-item" onclick="openApp(${app.id})" style="${app.id===currentId?'background:rgba(79,142,247,0.1);':''}">
+          <span class="top-rank ${rankClass[i]}">${i+1}</span>
+          <div class="top-img">
+            ${hasValidImage(app)
+              ? `<img src="${app.image}" style="width:100%;height:100%;object-fit:cover;">`
+              : getAppIcon(app, 'small')}
+          </div>
+          <div class="top-info">
+            <div class="top-name">${app.name}</div>
+            <div class="top-dl"><span class="num">${fmtK(safeNum(app.downloads))}</span> downloads</div>
+          </div>
+        </div>
+      `).join('')}
+      <button class="btn-more" onclick="closeModal()">View All →</button>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title"><span class="icon">📊</span> Store Statistics</div>
+      <div class="stat-row"><span class="stat-label">Total Apps</span><span class="stat-val">${allApps.length}</span></div>
+      <div class="stat-row"><span class="stat-label">Average Rating</span><span class="stat-val">⭐ ${(allApps.reduce((s,a)=>s+safeNum(a.rating),0)/allApps.length||0).toFixed(1)}</span></div>
+    </div>
+  `;
+}
+
+function openApp(id) {
+  const app = allApps.find(a => String(a.id) === String(id));
+  if(!app) return;
+  const overlay = document.getElementById('modal-overlay');
+  const main = document.getElementById('modal-main');
+
+  const stars = renderStars(app.rating);
+  const catLabel = getCatLabel(app.category);
+  const dl = safeNum(app.downloads);
+  const rt = safeNum(app.rating);
+  const rv = safeNum(app.reviews);
+  const linkApp = isLinkApp(app);
+
+  main.innerHTML = `
+    <div class="modal-hero">
+      <div class="modal-hero-cover">
+        ${hasValidImage(app)
+          ? `<img src="${app.image}" alt="${app.name}">`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${getAppIcon(app)}</div>`}
+      </div>
+      <div class="modal-hero-body">
+        <div class="modal-app-header">
+          <div class="modal-app-icon">
+            ${hasValidImage(app)
+              ? `<img src="${app.image}" style="width:100%;height:100%;object-fit:cover;">`
+              : getAppIcon(app)}
+          </div>
+          <div class="modal-app-info">
+            <div class="modal-app-name">${app.name}</div>
+            <div class="modal-app-dev">by ${app.developer || 'APPIKA-Studio'}</div>
+            <div class="modal-app-meta">
+              <span class="meta-badge"><span class="ic">📦</span> v${app.version}</span>
+              <span class="meta-badge"><span class="ic">💾</span> ${app.size}</span>
+              <span class="meta-badge"><span class="ic">⬇️</span> ${fmtK(dl)}</span>
+              <span class="meta-badge"><span class="ic">🏷️</span> ${catLabel}</span>
+              ${linkApp ? '<span class="meta-badge"><span class="ic">🔗</span> External Link</span>' : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-rating-row">
+          <div style="text-align:center;">
+            <div class="big-rating">${rt}</div>
+            <div class="stars">${stars}</div>
+            <div class="rating-count">${rv.toLocaleString()} ratings</div>
+          </div>
+          <div style="flex:1;">
+            ${[5,4,3,2,1].map(n => {
+              const pct = Math.max(5, Math.round(100 - Math.abs(n - rt) * 20));
+              return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span style="font-size:12px;color:var(--muted);width:12px;font-weight:700;">${n}</span>
+                <div style="flex:1;height:8px;background:var(--surface);border-radius:4px;overflow:hidden;">
+                  <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--gold),#F97316);border-radius:4px;"></div>
+                </div>
+                <span style="font-size:11px;color:var(--muted);width:32px;text-align:left;">${pct}%</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <button class="btn-dl-big ${linkApp ? 'open-btn' : ''}" onclick="downloadApp(${app.id})">
+          ${linkApp ? '🔗 Open App — ' + app.name : '⬇️ Download Now — ' + app.name}
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-hero" style="padding:28px;">
+      <div class="modal-section-title">📖 About This App</div>
+      <div class="modal-desc">${app.fullDescription || app.description}</div>
+
+      ${(app.tags||[]).length ? `
+      <div class="modal-section-title">🏷️ Tags</div>
+      <div class="modal-tags">${app.tags.map(t=>`<span class="modal-tag">${t}</span>`).join('')}</div>
+      ` : ''}
+
+      <div class="modal-section-title">ℹ️ Additional Information</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:12px;margin-bottom:6px;">Version</div>
+          <div style="font-weight:800;font-size:15px;">${app.version}</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:12px;margin-bottom:6px;">Size</div>
+          <div style="font-weight:800;font-size:15px;">${app.size}</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:12px;margin-bottom:6px;">Category</div>
+          <div style="font-weight:800;font-size:15px;">${catLabel}</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:12px;margin-bottom:6px;">${linkApp ? 'Type' : 'Downloads'}</div>
+          <div style="font-weight:800;font-size:15px;">${linkApp ? '🔗 External Link' : fmtK(dl) + '+'}</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:12px;margin-bottom:6px;">Developer</div>
+          <div style="font-weight:800;font-size:15px;">${app.developer || 'APPIKA-Studio'}</div>
+        </div>
+      </div>
+
+      <div class="modal-section-title">⭐ Ratings & Reviews</div>
+      <div style="display:flex;gap:20px;align-items:center;padding:24px;background:var(--surface-2);border-radius:16px;border:1px solid var(--border);">
+        <div style="text-align:center;min-width:100px;">
+          <div style="font-size:56px;font-weight:900;color:var(--gold);font-family:'Space Grotesk',sans-serif;line-height:1;">${rt}</div>
+          <div style="font-size:20px;color:var(--gold);margin:8px 0;letter-spacing:3px;">${stars}</div>
+          <div style="font-size:12px;color:var(--muted);">${rv.toLocaleString()} reviews</div>
+        </div>
+        <div style="flex:1;padding-left:20px;border-left:1px solid var(--border);">
+          <div style="font-size:14px;color:var(--text-dim);line-height:2;">
+            This app has an average rating of <strong style="color:var(--gold);">${rt}</strong> out of 5 stars
+            based on <strong style="color:var(--accent);">${rv.toLocaleString()}</strong> user reviews.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section-title">✍️ Write Your Review</div>
+
+      <div class="review-box">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+          <div style="min-width:160px;">
+            <label class="review-field-label">Your Rating</label>
+            <div class="star-picker" id="star-picker-${app.id}">
+              ${[1,2,3,4,5].map(n => `<span class="star-pick" data-val="${n}" onclick="setStarPick(${app.id},${n})">☆</span>`).join('')}
+            </div>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <label class="review-field-label">Your Name (Optional)</label>
+            <input type="text" class="review-input" id="review-name-${app.id}" placeholder="Anonymous">
+          </div>
+        </div>
+        <label class="review-field-label">Your Comment (Optional)</label>
+        <textarea class="review-input" id="review-comment-${app.id}" rows="3" placeholder="Share your opinion…" style="resize:vertical;margin-bottom:14px;"></textarea>
+        <button class="btn-submit-review" onclick="submitReview(${app.id})">📨 Submit Review</button>
+      </div>
+
+      ${(app.reviewsList && app.reviewsList.length) ? `
+      <div class="modal-section-title">💬 Latest Reviews (${app.reviewsList.length})</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${app.reviewsList.slice(0,15).map(rv2 => `
+          <div class="user-review-card">
+            <div class="rv-head">
+              <span class="rv-name">${escapeHtml(rv2.name || 'Anonymous')}</span>
+              <span class="rv-stars">${'★'.repeat(safeNum(rv2.rating))}${'☆'.repeat(5-safeNum(rv2.rating))}</span>
+            </div>
+            ${rv2.comment ? `<div class="rv-comment">${escapeHtml(rv2.comment)}</div>` : ''}
+            <div class="rv-date">${new Date(rv2.date).toLocaleDateString()}</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </div>
+  `;
+
+  renderModalSidebar(id);
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function downloadApp(id) {
+  const app = allApps.find(a => String(a.id) === String(id));
+  if(!app) { console.error('no app id', id); return; }
+
+  const linkApp = isLinkApp(app);
+
+  console.log('[action]', linkApp ? 'open' : 'download', 'app:', app.name, 'id=', id);
+
+  // سجّل العداد في السيرفر
+  try {
+    const r = await fetch(`/api/apps/${id}/download`, { method: 'POST' });
+    const res = await r.json();
+    if (res.ok) {
+      app.downloads = safeNum(res.downloads);
+    }
+  } catch (e) {
+    console.error('[action] count failed:', e);
+  }
+
+  // ───── لو تطبيق HTML أو Desktop → افتح الرابط ─────
+  if (linkApp) {
+    const url = app.apk || '';
+    if (url) {
+      showToast('🔗 جاري فتح التطبيق…', 'success');
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      showToast('⚠️ لا يوجد رابط لهذا التطبيق', 'error');
+    }
+    // تحديث الواجهة
+    await refreshData();
+    return;
+  }
+
+  // ───── للتطبيقات العادية → نزّل الملف ─────
+  showToast('✅ اتسجل التحميل (' + app.downloads + ')', 'success');
+  await refreshData();
+
+  const link = document.createElement('a');
+  link.href = app.apk;
+  link.download = getDownloadFileName(app);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+async function refreshData() {
+  try {
+    const fresh = await fetch('/api/apps', { cache: 'no-store' });
+    const freshData = await fresh.json();
+    allApps = (freshData.apps || []).map(a => ({
+      ...a,
+      downloads: safeNum(a.downloads),
+      rating: safeNum(a.rating),
+      reviews: safeNum(a.reviews)
+    }));
+  } catch (e) {
+    console.warn('refresh failed', e);
+  }
+  updateHero();
+  renderSidebar();
+  render();
+}
+
+function setStarPick(appId, val) {
+  selectedStars[appId] = val;
+  document.querySelectorAll(`#star-picker-${appId} .star-pick`).forEach(el => {
+    el.textContent = parseInt(el.dataset.val, 10) <= val ? '★' : '☆';
+  });
+}
+
+async function submitReview(appId) {
+  const rating = selectedStars[appId];
+  if (!rating) { showToast('⚠️ اختار عدد النجوم أولاً', 'error'); return; }
+  const name = document.getElementById(`review-name-${appId}`).value.trim();
+  const comment = document.getElementById(`review-comment-${appId}`).value.trim();
+
+  try {
+    const r = await fetch(`/api/apps/${appId}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating, name, comment })
+    });
+    const res = await r.json();
+    if (!res.ok) throw new Error(res.error || 'failed');
+
+    const app = allApps.find(a => String(a.id) === String(appId));
+    if (app) Object.assign(app, res.app);
+    delete selectedStars[appId];
+
+    await refreshData();
+    openApp(appId);
+    showToast('✅ شكرا على تقييمك!', 'success');
+  } catch (e) {
+    showToast('⚠️ تعذر إرسال التقييم', 'error');
+  }
+}
+
+function searchTag(tag) {
+  document.getElementById('search-input').value = tag;
+  currentSearch = tag;
+  currentCat = 'all';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-cat=all]').classList.add('active');
+  render();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    render();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  render();
+});
+
+document.getElementById('sort-select').addEventListener('change', e => {
+  currentSort = e.target.value;
+  render();
+});
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if(e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeModal();
+});
+
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+document.querySelectorAll('.footer-col a[data-goto]').forEach(a => {
+  a.addEventListener('click', () => {
+    const tab = document.querySelector('.tab-btn[data-cat="' + a.dataset.goto + '"]');
+    if (tab) tab.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+loadApps();
+</script>
+</body>
+</html>

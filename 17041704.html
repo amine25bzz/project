@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — DevStore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;700&display=swap">
+<style>
+:root {
+  --bg: #060910;
+  --surface: #0F1623;
+  --surface-2: #151E2E;
+  --border: rgba(99,179,255,0.10);
+  --border-hi: rgba(99,179,255,0.25);
+  --accent: #4F8EF7;
+  --accent-2: #A855F7;
+  --accent-3: #06B6D4;
+  --red: #EF4444;
+  --green: #10B981;
+  --gold: #F59E0B;
+  --text: #E8F0FF;
+  --text-dim: #A8B8D0;
+  --muted: #6B84A8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 70% 40% at 15% 10%, rgba(79,142,247,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 30% at 85% 85%, rgba(168,85,247,0.06) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(6,9,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+}
+.header-inner {
+  max-width: 1300px; margin: 0 auto;
+  display: flex; align-items: center; gap: 20px; height: 70px;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+.logo-text .dev { color: var(--text); }
+.logo-text .store {
+  background: linear-gradient(90deg, var(--accent-2), var(--accent-3), var(--accent), var(--accent-2));
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { to { background-position: 200% center; } }
+.admin-badge {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  color: white; padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+.header-actions { margin-left: auto; }
+.btn-back {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 12px; padding: 10px 18px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+  text-decoration: none; display: flex; align-items: center; gap: 6px;
+  transition: all 0.25s;
+}
+.btn-back:hover { color: var(--accent); border-color: var(--border-hi); }
+
+.admin-wrap {
+  max-width: 1300px; margin: 0 auto;
+  padding: 32px;
+  position: relative; z-index: 1;
+}
+
+.connect-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: var(--surface); border: 1px solid var(--border-hi);
+  border-radius: 16px; padding: 16px 22px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.connect-status { font-size: 13.5px; color: var(--text-dim); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.connect-status.ok { color: var(--green); }
+.connect-status.err { color: var(--red); }
+.fallback-note { font-size: 12px; color: var(--muted); width: 100%; }
+
+.stats-bar {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 22px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.stat-card .num { font-family: 'Space Grotesk',sans-serif; font-size: 30px; font-weight: 700; color: var(--accent); }
+.stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.add-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 32px; margin-bottom: 32px;
+}
+.add-section .section-title {
+  padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 0;
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+}
+.add-section .section-title .chev { transition: transform 0.25s; color: var(--muted); font-size: 14px; }
+.add-section .section-title.open .chev { transform: rotate(180deg); }
+#add-form-body { display: none; padding-top: 24px; }
+#add-form-body.open { display: block; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 13px; color: var(--text-dim); font-weight: 700; }
+.form-input, .form-select, .form-textarea {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 16px;
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 14px; outline: none;
+  transition: all 0.25s;
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 4px rgba(79,142,247,0.1);
+}
+.form-textarea { resize: vertical; min-height: 100px; font-family: 'Inter', sans-serif; }
+.form-select { appearance: none; cursor: pointer; }
+option { background: var(--surface-2); }
+
+.file-upload-area {
+  border: 2px dashed var(--border); border-radius: 14px;
+  padding: 24px; text-align: center; cursor: pointer;
+  transition: all 0.25s; background: var(--surface-2);
+  position: relative;
+}
+.file-upload-area:hover, .file-upload-area.dragover {
+  border-color: var(--accent); background: rgba(79,142,247,0.06);
+}
+.file-upload-area input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 32px; margin-bottom: 10px; }
+.upload-label { font-size: 13px; color: var(--text-dim); font-weight: 600; }
+.upload-label strong { color: var(--accent); }
+.upload-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+.upload-preview {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;
+  margin-top: 12px; font-size: 13px;
+}
+.upload-preview .file-name { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.upload-preview .file-size { color: var(--muted); font-size: 11px; }
+.upload-preview-img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+
+/* ─── حقل الرابط ─── */
+.url-input-wrap {
+  position: relative;
+}
+.url-input-wrap .url-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 18px; pointer-events: none; color: var(--accent-3);
+}
+.url-input-wrap .form-input {
+  padding-left: 48px;
+  font-family: 'Space Grotesk', monospace;
+  letter-spacing: 0.3px;
+}
+.url-hint-box {
+  background: rgba(6,182,212,0.08);
+  border: 1px solid rgba(6,182,212,0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.url-hint-box .ic { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.url-hint-box strong { color: var(--accent-3); }
+
+/* ─── محدد طريقة توفير التطبيق (ملف APK أو رابط إنترنت) ─── */
+.source-type-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.source-toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .source-toggle-group { grid-template-columns: 1fr; }
+}
+.source-option {
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  display: block;
+}
+.source-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.source-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  transition: all 0.22s ease;
+}
+.source-option:hover .source-card {
+  border-color: var(--border-hi);
+  background: rgba(79,142,247,0.05);
+}
+.source-option input[type="radio"]:checked + .source-card {
+  border-color: var(--accent);
+  background: rgba(79,142,247,0.12);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.source-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+}
+.source-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.source-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.source-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rating-input { display: flex; gap: 10px; align-items: center; }
+.rating-input input { flex: 1; }
+.rating-preview { color: var(--gold); font-size: 18px; min-width: 90px; font-weight: 700; }
+
+.form-actions { display: flex; gap: 12px; margin-top: 24px; }
+.btn-submit {
+  background: linear-gradient(135deg, var(--accent), #2563EB);
+  color: white; border: none; border-radius: 14px;
+  padding: 14px 32px; font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(79,142,247,0.3);
+  transition: all 0.25s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(79,142,247,0.5); }
+.btn-reset {
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 14px; padding: 14px 26px;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.25s;
+}
+.btn-reset:hover { color: var(--text); border-color: var(--border-hi); }
+
+.apps-list-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; overflow: hidden;
+}
+.list-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 28px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 16px;
+}
+.list-search {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 16px;
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 13px; outline: none; width: 260px;
+  transition: all 0.25s;
+}
+.list-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.1); }
+
+.app-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0,1fr) 130px 100px 100px 100px 110px 180px;
+  gap: 16px; align-items: center;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.app-row:last-child { border-bottom: none; }
+.app-row:hover { background: rgba(79,142,247,0.04); }
+.row-header {
+  background: var(--surface-2);
+  font-size: 11px; color: var(--muted); font-weight: 800; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.row-icon {
+  width: 48px; height: 48px; border-radius: 12px; overflow: hidden;
+  background: var(--surface-2); flex-shrink: 0;
+}
+.row-info .row-name { font-size: 14px; font-weight: 800; }
+.row-info .row-dev { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.cat-pill {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 5px 12px;
+  font-size: 11px; color: var(--accent-3); font-weight: 700; white-space: nowrap;
+  display: inline-flex; align-items: center;
+}
+.cat-pill.link-pill {
+  background: rgba(6,182,212,0.15);
+  border-color: rgba(6,182,212,0.4);
+  color: var(--accent-3);
+}
+.row-rating { color: var(--gold); font-size: 13px; font-weight: 800; }
+.row-dl { font-size: 13px; color: var(--muted); }
+.row-dl span { color: var(--accent); font-weight: 700; }
+.row-link-badge {
+  font-size: 11px; color: var(--accent-3); font-weight: 700;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(6,182,212,0.1);
+  padding: 3px 8px; border-radius: 6px;
+}
+.row-date { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.row-date .t { color: var(--muted); font-size: 11px; }
+.row-actions { display: flex; gap: 8px; }
+.btn-edit {
+  background: rgba(79,142,247,0.12); border: 1px solid rgba(79,142,247,0.25);
+  color: var(--accent); border-radius: 10px; padding: 7px 14px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-edit:hover { background: rgba(79,142,247,0.22); transform: translateY(-1px); }
+.btn-del {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+  color: var(--red); border-radius: 10px; padding: 7px 14px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-del:hover { background: rgba(239,68,68,0.2); transform: translateY(-1px); }
+
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px 28px; font-size: 14px; font-weight: 700;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 999;
+  opacity: 0; pointer-events: none; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(16,185,129,0.4); color: var(--green); }
+.toast.error { border-color: rgba(239,68,68,0.4); color: var(--red); }
+
+.edit-overlay {
+  position: fixed; inset: 0; background: rgba(6,9,16,0.92);
+  backdrop-filter: blur(16px); z-index: 200;
+  display: none; overflow-y: auto;
+}
+.edit-overlay.open { display: block; }
+.edit-modal {
+  max-width: 800px; margin: 40px auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 32px;
+  animation: modalIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.edit-modal h2 { font-size: 20px; font-weight: 800; margin-bottom: 24px; }
+.btn-close-modal {
+  background: none; border: none; color: var(--muted);
+  font-size: 26px; cursor: pointer; float: right; margin-top: -6px;
+  transition: color 0.2s; line-height: 1;
+}
+.btn-close-modal:hover { color: var(--text); }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+@media(max-width:900px) {
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .app-row { grid-template-columns: 48px 1fr auto; padding: 14px 18px; }
+  .app-row .cat-pill, .app-row .row-rating, .app-row .row-dl, .app-row .row-size, .app-row .row-date { display: none; }
+  .header-inner { height: 64px; gap: 12px; }
+  .logo-text { font-size: 18px; }
+  .admin-wrap { padding: 20px 16px; }
+  header { padding: 0 16px; }
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">
+        <img src="logo.png" alt="Logo">
+      </div>
+      <div class="logo-text"><span class="dev">APP</span><span class="store">IKA</span></div>
+    </a>
+    <div class="header-actions">
+      <a href="index.html" class="btn-back">Go Store APPIKA</a>
+    </div>
+    <div class="header-actions">
+      <a href="pages.html" class="btn-back">Go pages Settings</a>
+    </div>
+  </div>
+</header>
+
+<div class="admin-wrap">
+
+  <div class="connect-bar">
+    <div class="connect-status" id="connect-status">⏳ جاري الاتصال بالسيرفر…</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num" id="stat-total">0</div><div class="lbl">Total Apps</div></div>
+    <div class="stat-card"><div class="num" id="stat-dl">0</div><div class="lbl">Total Downloads</div></div>
+    <div class="stat-card"><div class="num" id="stat-rating">0</div><div class="lbl">Avg Rating</div></div>
+    <div class="stat-card"><div class="num" id="stat-cats">0</div><div class="lbl">Categories</div></div>
+  </div>
+
+  <div class="add-section" id="add-section">
+    <div class="section-title" id="add-toggle" onclick="toggleAddForm()">
+      <span>➕ Add New App</span>
+      <span class="chev">▾</span>
+    </div>
+    <div id="add-form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">App Name *</label>
+          <input type="text" class="form-input" id="f-name" placeholder="e.g., TaskFlow Pro">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select" id="f-cat" onchange="toggleFileOrUrl()">
+            <option value="">— Select Category —</option>
+            <option value="mobile">📱 Mobile Apps</option>
+            <option value="desktop">💻 Desktop Apps</option>
+            <option value="android-game">🎮 Android Games</option>
+            <option value="html-game">🌐 HTML Games</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Short Description *</label>
+          <input type="text" class="form-input" id="f-desc" placeholder="Short description shown on the card">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Full Description</label>
+          <textarea class="form-textarea" id="f-fulldesc" placeholder="Full description shown on the app page…" rows="5"></textarea>
+        </div>
+
+        <!-- خيار إدخال ملف الـ APK أو وضع رابط التطبيق من الإنترنت -->
+        <div class="form-group full source-type-container">
+          <label class="form-label">App Source / خيار توفير التطبيق *</label>
+          <div class="source-toggle-group">
+            <label class="source-option">
+              <input type="radio" name="f-source-type" id="f-source-file" value="file" checked onchange="setSourceType('file')">
+              <span class="source-card">
+                <span class="source-icon">📦</span>
+                <span class="source-info">
+                  <span class="source-title">رفع ملف APK / ملف مباشر</span>
+                  <span class="source-desc">رفع ملف التطبيق من جهازك (APK, EXE, ZIP)</span>
+                </span>
+              </span>
+            </label>
+            <label class="source-option">
+              <input type="radio" name="f-source-type" id="f-source-url" value="url" onchange="setSourceType('url')">
+              <span class="source-card">
+                <span class="source-icon">🔗</span>
+                <span class="source-info">
+                  <span class="source-title">رابط التطبيق من الإنترنت (Link)</span>
+                  <span class="source-desc">إدخال رابط تحميل مباشر أو رابط التطبيق</span>
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">App Image</label>
+          <div class="file-upload-area" id="img-drop">
+            <input type="file" id="f-img" accept="image/*" onchange="handleFileSelect('img', this)">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-label">Drag image here or <strong>click to select</strong></div>
+            <div class="upload-hint">PNG, JPG, WebP, SVG — up to 5MB</div>
+          </div>
+          <div id="img-preview" style="display:none;"></div>
+        </div>
+
+        <!-- حقل رفع الملف -->
+        <div class="form-group" id="file-upload-group">
+          <label class="form-label">App File / APK</label>
+          <div class="file-upload-area" id="apk-drop">
+            <input type="file" id="f-apk" onchange="handleFileSelect('apk', this)">
+            <div class="upload-icon">📦</div>
+            <div class="upload-label">Drag APK/EXE/HTML here or <strong>click to select</strong></div>
+            <div class="upload-hint">APK, EXE, HTML, ZIP</div>
+          </div>
+          <div id="apk-preview" style="display:none;"></div>
+        </div>
+
+        <!-- حقل الرابط -->
+        <div class="form-group" id="url-input-group" style="display:none;">
+          <label class="form-label">🔗 App URL / رابط التطبيق من الإنترنت (Link)</label>
+          <div class="url-input-wrap">
+            <span class="url-icon">🔗</span>
+            <input type="url" class="form-input" id="f-url" placeholder="https://example.com/app.apk أو رابط صفحة التحميل">
+          </div>
+          <div class="url-hint-box" style="margin-top: 10px;">
+            <span class="ic">💡</span>
+            <div>
+              <strong>رابط التطبيق:</strong> يمكنك وضع رابط مباشر لملف APK أو رابط اللعبة/التطبيق من الإنترنت. سيتم فتح هذا الرابط في تبويب جديد أو تنزيله عند النقر على التطبيق في المتجر.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rating (1.0 – 5.0)</label>
+          <div class="rating-input">
+            <input type="number" class="form-input" id="f-rating" min="1" max="5" step="0.1" placeholder="4.5" oninput="updateRatingPreview(this.value)">
+            <div class="rating-preview" id="rating-preview">⭐ —</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Number of Reviews</label>
+          <input type="number" class="form-input" id="f-reviews" min="0" placeholder="e.g., 1200">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Version</label>
+          <input type="text" class="form-input" id="f-version" placeholder="e.g., 1.0.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Size</label>
+          <input type="text" class="form-input" id="f-size" placeholder="e.g., 45 MB">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Downloads Count</label>
+          <input type="number" class="form-input" id="f-downloads" min="0" placeholder="e.g., 5000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Developer Name</label>
+          <input type="text" class="form-input" id="f-dev" placeholder="APPIKA-Studio">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Tags (comma separated)</label>
+          <input type="text" class="form-input" id="f-tags" placeholder="e.g., Productivity, Organization, Team">
+        </div>
+        <div class="form-group full">
+          <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="f-featured" style="width:18px;height:18px;accent-color:var(--gold);">
+            ⭐ Featured App (shows in Featured section)
+          </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-submit" onclick="addApp()">✅ Save App</button>
+        <button class="btn-reset" onclick="resetForm()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="apps-list-section">
+    <div class="list-header">
+      <div class="section-title" style="margin-bottom:0;border-bottom:none;padding-bottom:0;cursor:default;">
+        📋 Registered Apps <span id="list-count" style="color:var(--muted);font-size:13px;font-weight:400;"></span>
+      </div>
+      <input type="text" class="list-search" placeholder="🔍 Search…" oninput="filterList(this.value)">
+    </div>
+    <div class="app-row row-header">
+      <div></div>
+      <div>Name</div>
+      <div>Category</div>
+      <div>Rating</div>
+      <div>Downloads</div>
+      <div>Type</div>
+      <div>Date</div>
+      <div>Actions</div>
+    </div>
+    <div id="apps-list-body"></div>
+    <div id="list-empty" style="text-align:center;padding:80px;color:var(--muted);display:none;">
+      No apps added yet. Start by adding your first app! 🚀
+    </div>
+  </div>
+</div>
+
+<div class="edit-overlay" id="edit-overlay">
+  <div class="edit-modal">
+    <button class="btn-close-modal" onclick="closeEdit()">×</button>
+    <h2>✏️ Edit App</h2>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-input" id="edit-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="edit-cat" onchange="toggleEditFileOrUrl()">
+          <option value="mobile">📱 Mobile Apps</option>
+          <option value="desktop">💻 Desktop Apps</option>
+          <option value="android-game">🎮 Android Games</option>
+          <option value="html-game">🌐 HTML Games</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Short Description</label>
+        <input type="text" class="form-input" id="edit-desc">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Full Description</label>
+        <textarea class="form-textarea" id="edit-fulldesc" rows="5"></textarea>
+      </div>
+
+      <!-- خيار إدخال ملف الـ APK أو وضع رابط التطبيق من الإنترنت للتعديل -->
+      <div class="form-group full source-type-container">
+        <label class="form-label">App Source / خيار توفير التطبيق</label>
+        <div class="source-toggle-group">
+          <label class="source-option">
+            <input type="radio" name="edit-source-type" id="edit-source-file" value="file" checked onchange="setEditSourceType('file')">
+            <span class="source-card">
+              <span class="source-icon">📦</span>
+              <span class="source-info">
+                <span class="source-title">ملف التطبيق / APK</span>
+                <span class="source-desc">رفع ملف جديد أو استبداله</span>
+              </span>
+            </span>
+          </label>
+          <label class="source-option">
+            <input type="radio" name="edit-source-type" id="edit-source-url" value="url" onchange="setEditSourceType('url')">
+            <span class="source-card">
+              <span class="source-icon">🔗</span>
+              <span class="source-info">
+                <span class="source-title">رابط التطبيق من الإنترنت (Link)</span>
+                <span class="source-desc">رابط خارجي للتحميل أو فتح التطبيق</span>
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">New Image (optional)</label>
+        <div class="file-upload-area">
+          <input type="file" id="edit-img" accept="image/*" onchange="handleEditFile('img', this)">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label"><strong>Click to replace image</strong></div>
+        </div>
+        <div id="edit-img-preview" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- حقل الملف للتعديل -->
+      <div class="form-group" id="edit-file-upload-group">
+        <label class="form-label">New File (optional)</label>
+        <div class="file-upload-area">
+          <input type="file" id="edit-apk" onchange="handleEditFile('apk', this)">
+          <div class="upload-icon">📦</div>
+          <div class="upload-label"><strong>Click to replace file</strong></div>
+        </div>
+        <div id="edit-apk-preview" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- حقل الرابط للتعديل -->
+      <div class="form-group" id="edit-url-input-group" style="display:none;">
+        <label class="form-label">🔗 App URL / رابط التطبيق من الإنترنت (Link)</label>
+        <div class="url-input-wrap">
+          <span class="url-icon">🔗</span>
+          <input type="url" class="form-input" id="edit-url" placeholder="https://example.com/app.apk أو رابط صفحة التحميل">
+        </div>
+        <div class="url-hint-box" style="margin-top: 10px;">
+          <span class="ic">💡</span>
+          <div>سيتم فتح هذا الرابط في تبويب جديد أو تنزيله عند الضغط على التطبيق في المتجر.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rating</label>
+        <input type="number" class="form-input" id="edit-rating" min="1" max="5" step="0.1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of Reviews</label>
+        <input type="number" class="form-input" id="edit-reviews">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Version</label>
+        <input type="text" class="form-input" id="edit-version">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Size</label>
+        <input type="text" class="form-input" id="edit-size">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Downloads</label>
+        <input type="number" class="form-input" id="edit-downloads">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Developer</label>
+        <input type="text" class="form-input" id="edit-dev">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="edit-tags">
+      </div>
+      <div class="form-group full">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="edit-featured" style="width:18px;height:18px;accent-color:var(--gold);">
+          ⭐ Featured App
+        </label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-submit" onclick="saveEdit()">💾 Save Changes</button>
+      <button class="btn-reset" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let apps = [];
+let filterQuery = '';
+let pendingFiles = { img: null, apk: null };
+let editFiles = { img: null, apk: null };
+
+/* ─── دوال مساعدة ─── */
+function safeNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function fmtK(n) {
+  const v = safeNum(n);
+  if (v >= 1000000) return (v/1000000).toFixed(1) + 'M';
+  if (v >= 1000) return (v/1000).toFixed(1) + 'K';
+  return String(v);
+}
+
+/* ─── هل الفئة من نوع رابط؟ ─── */
+function isLinkCategory(cat) {
+  return cat === 'html-game' || cat === 'desktop';
+}
+function isLinkApp(app) {
+  if (!app) return false;
+  if (app.isLink === true) return true;
+  if (app.isLink === false) return false;
+  if (app.apk && /^https?:\/\//i.test(app.apk)) return true;
+  return app.category === 'html-game' || app.category === 'desktop';
+}
+
+/* ─── التحكم في نوع المصدر (ملف أو رابط) ─── */
+function setSourceType(type) {
+  const isUrl = (type === 'url');
+  const fileRadio = document.getElementById('f-source-file');
+  const urlRadio = document.getElementById('f-source-url');
+  if (fileRadio && urlRadio) {
+    fileRadio.checked = !isUrl;
+    urlRadio.checked = isUrl;
+  }
+  const fileGrp = document.getElementById('file-upload-group');
+  const urlGrp = document.getElementById('url-input-group');
+  if (fileGrp) fileGrp.style.display = isUrl ? 'none' : 'flex';
+  if (urlGrp) urlGrp.style.display = isUrl ? 'flex' : 'none';
+}
+
+function setEditSourceType(type) {
+  const isUrl = (type === 'url');
+  const fileRadio = document.getElementById('edit-source-file');
+  const urlRadio = document.getElementById('edit-source-url');
+  if (fileRadio && urlRadio) {
+    fileRadio.checked = !isUrl;
+    urlRadio.checked = isUrl;
+  }
+  const fileGrp = document.getElementById('edit-file-upload-group');
+  const urlGrp = document.getElementById('edit-url-input-group');
+  if (fileGrp) fileGrp.style.display = isUrl ? 'none' : 'flex';
+  if (urlGrp) urlGrp.style.display = isUrl ? 'flex' : 'none';
+}
+
+/* ─── تغيير الفئة (يقترح النوع الافتراضي مع إمكانية التبديل بحرية) ─── */
+function toggleFileOrUrl() {
+  const cat = document.getElementById('f-cat').value;
+  if (cat === 'html-game') {
+    setSourceType('url');
+  } else if (cat === 'mobile' || cat === 'android-game') {
+    setSourceType('file');
+  }
+}
+
+function toggleEditFileOrUrl() {
+  // يتيح للمشرف تغيير الفئة مع الحفاظ على اختياره الحالي للمصدر
+}
+
+/* ---------- load/save via API ---------- */
+async function loadApps() {
+  const statusEl = document.getElementById('connect-status');
+  try {
+    const r = await fetch('/api/apps', { cache: 'no-store' });
+    if (!r.ok) throw new Error('bad response');
+    const data = await r.json();
+    apps = data.apps || [];
+    statusEl.textContent = '✅ The store is updated automatically upon registration.';
+    statusEl.classList.add('ok');
+    statusEl.classList.remove('err');
+  } catch (e) {
+    apps = [];
+    statusEl.textContent = '⚠️ ما قدرتش نوصل للسيرفر. شغّل "node server.js"';
+    statusEl.classList.add('err');
+    statusEl.classList.remove('ok');
+  }
+  updateStats();
+  renderList();
+  startAutoRefresh();
+}
+
+let refreshTimer = null;
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(async () => {
+    if (document.hidden) return;
+    try {
+      const r = await fetch('/api/apps', { cache: 'no-store' });
+      const data = await r.json();
+      const fresh = data.apps || [];
+      const changed = fresh.length !== apps.length ||
+        fresh.some((a, i) => apps[i] && a.downloads !== apps[i].downloads);
+      if (changed) {
+        apps = fresh;
+        updateStats();
+        renderList();
+        console.log('[admin] auto-refreshed');
+      }
+    } catch (e) { /* تجاهل */ }
+  }, 10000);
+}
+
+async function saveToFile() {
+  try {
+    const r = await fetch('/api/apps', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apps })
+    });
+    const res = await r.json();
+    if (!res.ok) throw new Error(res.error || 'unknown error');
+    return true;
+  } catch (e) {
+    showToast('⚠️ تعذر الحفظ فـ apps.json — تأكد السيرفر شغال (node server.js)', 'error');
+    return false;
+  }
+}
+
+function toggleAddForm() {
+  document.getElementById('add-toggle').classList.toggle('open');
+  document.getElementById('add-form-body').classList.toggle('open');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = apps.length;
+  const totalDL = apps.reduce((s,a)=>s+safeNum(a.downloads),0);
+  document.getElementById('stat-dl').textContent = fmtK(totalDL) + '+';
+  const avg = apps.length ? (apps.reduce((s,a)=>s+(a.rating||0),0)/apps.length).toFixed(1) : '0';
+  document.getElementById('stat-rating').textContent = avg;
+  const cats = new Set(apps.map(a=>a.category)).size;
+  document.getElementById('stat-cats').textContent = cats;
+  document.getElementById('list-count').textContent = '(' + apps.length + ' apps)';
+}
+
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function getDefaultExt(cat) {
+  if (cat === 'desktop') return '.exe';
+  if (cat === 'html-game') return '.html';
+  return '.apk';
+}
+
+async function handleFileSelect(type, input) {
+  const file = input.files[0];
+  if(!file) return;
+  const dataUrl = await fileToDataURL(file);
+  pendingFiles[type] = { file, dataUrl, fileName: file.name };
+  const preview = document.getElementById(type === 'img' ? 'img-preview' : 'apk-preview');
+  if(type === 'img') {
+    preview.style.display = 'block';
+    preview.innerHTML = `<div class="upload-preview">
+      <img class="upload-preview-img" src="${dataUrl}">
+      <span class="file-name">${file.name}</span>
+      <span class="file-size">${(file.size/1024/1024).toFixed(2)} MB</span>
+    </div>`;
+  } else {
+    // ملء حقل الحجم تلقائياً إذا كان فارغاً عند اختيار ملف APK
+    const sizeInput = document.getElementById('f-size');
+    if (sizeInput && !sizeInput.value.trim()) {
+      sizeInput.value = (file.size/1024/1024).toFixed(1) + ' MB';
+    }
+    preview.style.display = 'block';
+    preview.innerHTML = `<div class="upload-preview">
+      <span style="font-size:24px;">📦</span>
+      <span class="file-name">${file.name}</span>
+      <span class="file-size">${(file.size/1024/1024).toFixed(2)} MB</span>
+    </div>`;
+  }
+}
+
+async function handleEditFile(type, input) {
+  const file = input.files[0];
+  if(!file) return;
+  const dataUrl = await fileToDataURL(file);
+  editFiles[type] = { file, dataUrl, fileName: file.name };
+  const preview = document.getElementById('edit-' + type + '-preview');
+  if(type === 'img') {
+    preview.innerHTML = `<div class="upload-preview">
+      <img class="upload-preview-img" src="${dataUrl}">
+      <span class="file-name">${file.name}</span>
+    </div>`;
+  } else {
+    const editSize = document.getElementById('edit-size');
+    if (editSize && (!editSize.value.trim() || editSize.value === 'External Link' || editSize.value === 'Unknown')) {
+      editSize.value = (file.size/1024/1024).toFixed(1) + ' MB';
+    }
+    preview.innerHTML = `<div class="upload-preview">
+      <span style="font-size:24px;">📦</span>
+      <span class="file-name">${file.name}</span>
+      <span class="file-size">${(file.size/1024/1024).toFixed(2)} MB</span>
+    </div>`;
+  }
+}
+
+function updateRatingPreview(v) {
+  const el = document.getElementById('rating-preview');
+  if(!v) { el.textContent = '⭐ —'; return; }
+  const stars = Math.round(parseFloat(v));
+  el.textContent = '⭐'.repeat(Math.min(stars,5)) + ' ' + v;
+}
+
+async function addApp() {
+  const name = document.getElementById('f-name').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const desc = document.getElementById('f-desc').value.trim();
+  if(!name || !cat || !desc) { showToast('⚠️ Please fill in required fields', 'error'); return; }
+
+  const sourceType = document.querySelector('input[name="f-source-type"]:checked')?.value || 'file';
+  const isLink = (sourceType === 'url');
+  const urlValue = document.getElementById('f-url').value.trim();
+  const imgFile = pendingFiles.img;
+  const apkFile = pendingFiles.apk;
+
+  // التحقق من الرابط في حال اختيار وضع الرابط
+  if (isLink) {
+    if (!urlValue) {
+      showToast('⚠️ أدخل رابط التطبيق أولاً في خانة اللينك', 'error');
+      return;
+    }
+    if (!/^https?:\/\//i.test(urlValue)) {
+      showToast('⚠️ الرابط يجب أن يبدأ بـ http:// أو https://', 'error');
+      return;
+    }
+  }
+
+  let appUrl, apkFileName;
+
+  if (isLink) {
+    appUrl = urlValue;
+    apkFileName = '';
+  } else {
+    appUrl = apkFile ? apkFile.dataUrl : 'apk/' + name.toLowerCase().replace(/\s+/g,'-') + getDefaultExt(cat);
+    apkFileName = apkFile ? apkFile.fileName : (name.toLowerCase().replace(/\s+/g,'-') + getDefaultExt(cat));
+  }
+
+  const userSize = document.getElementById('f-size').value.trim();
+  let finalSize = userSize;
+  if (!finalSize) {
+    if (isLink) {
+      finalSize = 'External Link';
+    } else if (apkFile && apkFile.file) {
+      finalSize = (apkFile.file.size / 1024 / 1024).toFixed(1) + ' MB';
+    } else {
+      finalSize = 'Unknown';
+    }
+  }
+
+  const newApp = {
+    id: Date.now(),
+    name,
+    category: cat,
+    description: desc,
+    fullDescription: document.getElementById('f-fulldesc').value.trim(),
+    image: imgFile ? imgFile.dataUrl : 'img/' + name.toLowerCase().replace(/\s+/g,'-') + '.png',
+    apk: appUrl,
+    apkFileName: apkFileName,
+    isLink: isLink,
+    rating: parseFloat(document.getElementById('f-rating').value) || 4.0,
+    reviews: parseInt(document.getElementById('f-reviews').value) || 0,
+    version: document.getElementById('f-version').value.trim() || '1.0.0',
+    size: finalSize,
+    downloads: parseInt(document.getElementById('f-downloads').value) || 0,
+    developer: document.getElementById('f-dev').value.trim() || 'APPIKA-Studio',
+    tags: document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    featured: document.getElementById('f-featured').checked,
+    screenshots: [],
+    reviewsList: []
+  };
+
+  apps.unshift(newApp);
+  const ok = await saveToFile();
+  updateStats();
+  renderList();
+  if (ok) {
+    resetForm();
+    toggleAddForm();
+    showToast('✅ App registered in apps.json', 'success');
+  }
+}
+
+function resetForm() {
+  ['f-name','f-cat','f-desc','f-fulldesc','f-rating','f-reviews','f-version','f-size','f-downloads','f-dev','f-tags','f-url'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('f-featured').checked = false;
+  document.getElementById('f-img').value = '';
+  document.getElementById('f-apk').value = '';
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('apk-preview').style.display = 'none';
+  document.getElementById('rating-preview').textContent = '⭐ —';
+  pendingFiles = { img: null, apk: null };
+  setSourceType('file');
+}
+
+function filterList(q) {
+  filterQuery = q.toLowerCase();
+  renderList();
+}
+
+function getAppIconSmall(app) {
+  const colors = {
+    mobile: ['#4F8EF7','#2563EB'], desktop: ['#A855F7','#7C3AED'],
+    'android-game': ['#06B6D4','#0891B2'], 'html-game': ['#F59E0B','#D97706']
+  };
+  const [c1,c2] = colors[app.category] || ['#4F8EF7','#2563EB'];
+  const icons = { mobile:'📱', desktop:'💻', 'android-game':'🎮', 'html-game':'🌐' };
+  return `<div style="width:100%;height:100%;background:linear-gradient(135deg,${c1},${c2});display:flex;align-items:center;justify-content:center;font-size:22px;border-radius:12px;">${icons[app.category]||'⚡'}</div>`;
+}
+
+function hasValidImage(app) {
+  return app.image && !app.image.startsWith('img/');
+}
+
+function fmtDateTime(id) {
+  const n = Number(id);
+  if (!Number.isFinite(n) || n < 946684800000) return '<span style="color:var(--muted)">—</span>';
+  const d = new Date(n);
+  const p = x => String(x).padStart(2, '0');
+  return `<div>${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}</div><div class="t">${p(d.getHours())}:${p(d.getMinutes())}</div>`;
+}
+
+function renderList() {
+  const body = document.getElementById('apps-list-body');
+  const empty = document.getElementById('list-empty');
+  let list = filterQuery
+    ? apps.filter(a => a.name.toLowerCase().includes(filterQuery) || (a.description||'').toLowerCase().includes(filterQuery))
+    : apps;
+
+  if(!list.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const catLabels = { mobile:'📱 Mobile', desktop:'💻 Desktop', 'android-game':'🎮 Android', 'html-game':'🌐 HTML' };
+  body.innerHTML = list.map(app => {
+    const linkApp = isLinkApp(app);
+    const typeCell = linkApp
+      ? `<span class="row-link-badge">🔗 Open</span>`
+      : `<span style="font-size:12px;color:var(--muted);">${app.size}</span>`;
+    return `
+    <div class="app-row">
+      <div class="row-icon">${hasValidImage(app) ? `<img src="${app.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : getAppIconSmall(app)}</div>
+      <div class="row-info">
+        <div class="row-name">${app.name} ${app.featured ? '⭐' : ''}</div>
+        <div class="row-dev">${app.developer || 'APPIKA-Studio'} · v${app.version}</div>
+      </div>
+      <span class="cat-pill ${linkApp ? 'link-pill' : ''}">${catLabels[app.category] || app.category}</span>
+      <div class="row-rating">⭐ ${app.rating}</div>
+      <div class="row-dl"><span>${fmtK(app.downloads)}</span></div>
+      <div class="row-size">${typeCell}</div>
+      <div class="row-date">${fmtDateTime(app.id)}</div>
+      <div class="row-actions">
+        <button class="btn-edit" onclick="openEdit(${app.id})">✏️ Edit</button>
+        <button class="btn-del" onclick="deleteApp(${app.id})">🗑️ Delete</button>
+      </div>
+    </div>
+  `;
+  }).join('');
+}
+
+async function deleteApp(id) {
+  if(!confirm('Are you sure you want to permanently delete this app?')) return;
+  const prev = apps;
+  apps = apps.filter(a => a.id !== id);
+  const ok = await saveToFile();
+  if (!ok) { apps = prev; }
+  updateStats();
+  renderList();
+  if (ok) showToast('🗑️ App deleted', 'error');
+}
+
+function openEdit(id) {
+  const app = apps.find(a => a.id === id);
+  if(!app) return;
+  editFiles = { img: null, apk: null };
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-name').value = app.name;
+  document.getElementById('edit-cat').value = app.category;
+  document.getElementById('edit-desc').value = app.description;
+  document.getElementById('edit-fulldesc').value = app.fullDescription || '';
+  document.getElementById('edit-rating').value = app.rating;
+  document.getElementById('edit-reviews').value = app.reviews;
+  document.getElementById('edit-version').value = app.version;
+  document.getElementById('edit-size').value = app.size;
+  document.getElementById('edit-downloads').value = app.downloads;
+  document.getElementById('edit-dev').value = app.developer || '';
+  document.getElementById('edit-tags').value = (app.tags||[]).join(', ');
+  document.getElementById('edit-featured').checked = app.featured || false;
+
+  // تحديد نوع المصدر الحالي (رابط أو ملف)
+  const isUrl = app.isLink === true || (app.apk && /^https?:\/\//i.test(app.apk));
+  setEditSourceType(isUrl ? 'url' : 'file');
+  document.getElementById('edit-url').value = isUrl ? (app.apk || '') : '';
+
+  document.getElementById('edit-img-preview').innerHTML = '';
+  document.getElementById('edit-apk-preview').innerHTML = (!isUrl && app.apk)
+    ? `<div style="font-size:12px;color:var(--text-dim);margin-top:6px;">Current: ${app.apkFileName || (app.apk.startsWith('data:') ? 'Custom File' : app.apk)}</div>`
+    : '';
+
+  document.getElementById('edit-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEdit() {
+  document.getElementById('edit-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function saveEdit() {
+  const id = parseInt(document.getElementById('edit-id').value);
+  const app = apps.find(a => a.id === id);
+  if(!app) return;
+  app.name = document.getElementById('edit-name').value.trim();
+  app.category = document.getElementById('edit-cat').value;
+  app.description = document.getElementById('edit-desc').value.trim();
+  app.fullDescription = document.getElementById('edit-fulldesc').value.trim();
+  app.rating = parseFloat(document.getElementById('edit-rating').value) || app.rating;
+  app.reviews = parseInt(document.getElementById('edit-reviews').value) || app.reviews;
+  app.version = document.getElementById('edit-version').value.trim() || app.version;
+  app.size = document.getElementById('edit-size').value.trim() || app.size;
+  app.downloads = parseInt(document.getElementById('edit-downloads').value) || app.downloads;
+  app.developer = document.getElementById('edit-dev').value.trim() || app.developer;
+  app.tags = document.getElementById('edit-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  app.featured = document.getElementById('edit-featured').checked;
+
+  if(editFiles.img) app.image = editFiles.img.dataUrl;
+
+  const sourceType = document.querySelector('input[name="edit-source-type"]:checked')?.value || 'file';
+  const isUrl = (sourceType === 'url');
+  app.isLink = isUrl;
+
+  if (isUrl) {
+    const urlVal = document.getElementById('edit-url').value.trim();
+    if (!urlVal) {
+      showToast('⚠️ أدخل رابط التطبيق أولاً في خانة اللينك', 'error');
+      return;
+    }
+    if (!/^https?:\/\//i.test(urlVal)) {
+      showToast('⚠️ الرابط يجب أن يبدأ بـ http:// أو https://', 'error');
+      return;
+    }
+    app.apk = urlVal;
+    app.apkFileName = '';
+    if (!app.size || app.size === 'Unknown') app.size = 'External Link';
+  } else {
+    if(editFiles.apk) {
+      app.apk = editFiles.apk.dataUrl;
+      app.apkFileName = editFiles.apk.fileName;
+    }
+  }
+
+  const ok = await saveToFile();
+  updateStats();
+  renderList();
+  if (ok) {
+    closeEdit();
+    showToast('💾 Changes saved to apps.json', 'success');
+  }
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.classList.remove('show'); }, 3000);
+}
+
+['img-drop','apk-drop'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+  el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if(!file) return;
+    const type = id === 'img-drop' ? 'img' : 'apk';
+    handleFileSelect(type, { files: [file] });
+  });
+});
+
+document.getElementById('edit-overlay').addEventListener('click', e => {
+  if(e.target === document.getElementById('edit-overlay')) closeEdit();
+});
+
+loadApps();
+</script>
+</body>
+</html>

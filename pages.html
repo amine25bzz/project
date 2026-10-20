@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>APPIKA — Info Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #060910;
+  --bg-2: #0A0F1A;
+  --surface: #0F1623;
+  --surface-2: #151E2E;
+  --surface-3: #1C2740;
+  --border: rgba(99,179,255,0.10);
+  --border-hi: rgba(99,179,255,0.25);
+  --accent: #4F8EF7;
+  --accent-2: #A855F7;
+  --accent-3: #06B6D4;
+  --accent-4: #EC4899;
+  --gold: #F59E0B;
+  --green: #10B981;
+  --red: #EF4444;
+  --text: #E8F0FF;
+  --text-dim: #A8B8D0;
+  --muted: #6B84A8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,142,247,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(168,85,247,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ---------- top bar (shared) ---------- */
+.pg-topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(6,9,16,0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+.pg-topbar-inner {
+  max-width: 900px; margin: 0 auto; padding: 0 28px;
+  height: 70px; display: flex; align-items: center; gap: 16px;
+}
+.pg-back {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  padding: 10px 18px; border-radius: 12px;
+  text-decoration: none; transition: all 0.25s; flex-shrink: 0;
+}
+.pg-back:hover { color: var(--accent); border-color: var(--border-hi); background: var(--surface-2); }
+.pg-crumb { font-size: 13px; color: var(--muted); font-weight: 600; }
+.pg-crumb b { color: var(--text-dim); }
+
+/* ---------- full-screen windows ---------- */
+.page-window {
+  display: none;
+  min-height: calc(100vh - 70px);
+  position: relative; z-index: 1;
+}
+.page-window.active { display: block; }
+.pg-body {
+  max-width: 780px; margin: 0 auto; padding: 56px 28px 100px;
+}
+.pg-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--accent);
+  margin-bottom: 14px;
+}
+.pg-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.pg-title {
+  font-size: 36px; font-weight: 900; line-height: 1.15;
+  letter-spacing: -1px; margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--accent) 70%, var(--accent-2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.pg-updated { font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+.pg-lead { font-size: 16px; line-height: 1.85; color: var(--text-dim); margin-bottom: 36px; max-width: 68ch; }
+.pg-section { margin-bottom: 34px; }
+.pg-h3 {
+  font-size: 18px; font-weight: 800; color: var(--text);
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.pg-p { font-size: 14.5px; line-height: 1.9; color: var(--text-dim); max-width: 68ch; margin-bottom: 12px; }
+.pg-p:last-child { margin-bottom: 0; }
+.pg-list { list-style: none; display: flex; flex-direction: column; gap: 10px; max-width: 68ch; }
+.pg-list li {
+  font-size: 14.5px; line-height: 1.75; color: var(--text-dim);
+  padding-left: 20px; position: relative;
+}
+.pg-list li::before {
+  content: '';
+  position: absolute; left: 0; top: 9px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+}
+.pg-card {
+  background: rgba(15,22,35,0.85); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 22px; margin-top: 6px;
+}
+.pg-contact-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 8px;
+}
+.pg-contact-item {
+  background: rgba(15,22,35,0.85); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+}
+.pg-contact-item .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+.pg-contact-item .val { font-size: 14.5px; color: var(--text); font-weight: 700; }
+.pg-contact-item a.val { color: var(--accent); text-decoration: none; }
+.pg-faq { display: flex; flex-direction: column; gap: 10px; }
+.pg-faq details {
+  background: rgba(15,22,35,0.85); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 20px; transition: border-color 0.2s;
+}
+.pg-faq details[open] { border-color: var(--border-hi); }
+.pg-faq summary {
+  font-size: 14.5px; font-weight: 700; color: var(--text);
+  cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;
+}
+.pg-faq summary::-webkit-details-marker { display: none; }
+.pg-faq summary::after { content: '+'; color: var(--accent); font-size: 18px; font-weight: 400; }
+.pg-faq details[open] summary::after { content: '–'; }
+.pg-faq .pg-p { margin-top: 12px; }
+.pg-tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pg-tag {
+  background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--accent); font-weight: 700;
+}
+.pg-link-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  color: white; border: none; border-radius: 12px; padding: 12px 22px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(168,85,247,0.25); margin-top: 8px;
+}
+
+/* ---------- hub (index of pages) ---------- */
+#hub .pg-body { max-width: 1000px; }
+.hub-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px; margin-top: 8px;
+}
+.hub-card {
+  background: rgba(15,22,35,0.85); border: 1px solid var(--border);
+  border-radius: 18px; padding: 22px; text-decoration: none;
+  display: flex; flex-direction: column; gap: 8px; transition: all 0.25s;
+}
+.hub-card:hover { transform: translateY(-4px); border-color: var(--border-hi); box-shadow: 0 16px 40px rgba(79,142,247,0.12); }
+.hub-card .ic { font-size: 24px; }
+.hub-card .nm { font-size: 15px; font-weight: 800; color: var(--text); }
+.hub-card .ds { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.hub-kicker { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 30px 0 14px; }
+.hub-kicker:first-of-type { margin-top: 0; }
+
+@media (max-width: 640px) {
+  .pg-title { font-size: 26px; }
+  .pg-body { padding: 36px 18px 80px; }
+  .pg-contact-grid { grid-template-columns: 1fr; }
+  .pg-topbar-inner { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="pg-topbar">
+  <div class="pg-topbar-inner">
+    <a class="pg-back" href="index.html">← Back to Store</a>
+    <span class="pg-crumb">APPIKA <b id="crumb-current"></b></span>
+  </div>
+</div>
+
+<!-- ============ HUB (shown when no / unknown hash) ============ -->
+<div class="page-window" id="hub">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Info Center</div>
+    <h1 class="pg-title">Everything about APPIKA</h1>
+    <p class="pg-lead">Policies, support and background information for the APPIKA store, all in one place.</p>
+
+    <div class="hub-kicker">Legal</div>
+    <div class="hub-grid">
+      <a class="hub-card" href="#terms"><span class="ic">📄</span><span class="nm">Terms of Service</span><span class="ds">The rules for using the APPIKA store.</span></a>
+      <a class="hub-card" href="#privacy"><span class="ic">🔒</span><span class="nm">Privacy Policy</span><span class="ds">What we collect and how it's used.</span></a>
+      <a class="hub-card" href="#cookies"><span class="ic">🍪</span><span class="nm">Cookie Policy</span><span class="ds">How cookies keep the store running.</span></a>
+      <a class="hub-card" href="#about"><span class="ic">✨</span><span class="nm">About APPIKA</span><span class="ds">Who's behind the store.</span></a>
+    </div>
+
+    <div class="hub-kicker">Support</div>
+    <div class="hub-grid">
+      <a class="hub-card" href="#help"><span class="ic">💬</span><span class="nm">Help Center</span><span class="ds">Answers to common questions.</span></a>
+      <a class="hub-card" href="#contact"><span class="ic">✉️</span><span class="nm">Contact Us</span><span class="ds">Reach the APPIKA team directly.</span></a>
+      <a class="hub-card" href="#report"><span class="ic">🚩</span><span class="nm">Report a Problem</span><span class="ds">Flag a bug, app or listing.</span></a>
+      <a class="hub-card" href="#developers"><span class="ic">🛠️</span><span class="nm">Developers</span><span class="ds">Publish your app on APPIKA.</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TERMS OF SERVICE ============ -->
+<div class="page-window" id="pg-terms">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Legal</div>
+    <h1 class="pg-title">Terms of Service</h1>
+    <div class="pg-updated">Last updated September 2026</div>
+    <p class="pg-lead">These terms govern your use of the APPIKA store and every app or game you download through it. By browsing or downloading, you agree to the terms below.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">1. Using the store</div>
+      <p class="pg-p">APPIKA gives you access to a curated catalog of apps and games built by APPIKA‑Studio. You may browse, search and download any listed app for personal, non‑commercial use unless a listing says otherwise.</p>
+      <p class="pg-p">You're responsible for the device you install apps on, and for keeping it updated and secure. We don't guarantee that every app is compatible with every device.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">2. Accounts and access</div>
+      <p class="pg-p">Some areas of the store — such as reviewing an app or the Admin Panel — may require identifying information. You agree to provide accurate information and to keep any access credentials confidential.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">3. Acceptable use</div>
+      <ul class="pg-list">
+        <li>Don't redistribute, resell or repackage apps downloaded from APPIKA without permission.</li>
+        <li>Don't attempt to reverse‑engineer, decompile or tamper with app files.</li>
+        <li>Don't post reviews that are abusive, misleading, or unrelated to the app.</li>
+        <li>Don't use automated tools to inflate downloads, ratings or reviews.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">4. Content and ownership</div>
+      <p class="pg-p">Apps, icons, screenshots and descriptions listed on APPIKA remain the property of APPIKA‑Studio or the respective developer. Downloading an app grants you a license to use it — not ownership of its underlying code or assets.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">5. Changes and termination</div>
+      <p class="pg-p">We may update these terms, add or remove listings, or restrict access to the store at any time. Continuing to use APPIKA after a change means you accept the updated terms.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">6. Limitation of liability</div>
+      <p class="pg-p">Apps are provided "as is." APPIKA isn't liable for data loss, device issues or damages arising from installing or using a listed app, to the extent permitted by law.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRIVACY POLICY ============ -->
+<div class="page-window" id="pg-privacy">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Legal</div>
+    <h1 class="pg-title">Privacy Policy</h1>
+    <div class="pg-updated">Last updated September 2026</div>
+    <p class="pg-lead">This policy explains what information APPIKA collects when you use the store, why we collect it, and the choices you have.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">Information we collect</div>
+      <ul class="pg-list">
+        <li><strong style="color:var(--text)">Usage data</strong> — which apps you view, search and download, used to power download counts and rankings.</li>
+        <li><strong style="color:var(--text)">Review content</strong> — the rating, name and comment you choose to submit with a review.</li>
+        <li><strong style="color:var(--text)">Device information</strong> — basic technical details (browser, screen size) used to keep the store working correctly.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">How we use it</div>
+      <p class="pg-p">Information is used to operate the store: displaying accurate download and rating counts, showing your reviews to other visitors, and improving which apps are featured or recommended. We don't sell personal information to third parties.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">What you control</div>
+      <ul class="pg-list">
+        <li>Reviews can be submitted with just a rating — your name and comment are optional.</li>
+        <li>You can contact us at any time to request that a review you posted be removed.</li>
+        <li>You can stop using the store at any time; no account deletion is required since browsing doesn't create one.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Data retention</div>
+      <p class="pg-p">Aggregate data such as download counts and ratings is kept as long as the app remains listed on APPIKA, since it reflects the app's overall history on the store.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ COOKIE POLICY ============ -->
+<div class="page-window" id="pg-cookies">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Legal</div>
+    <h1 class="pg-title">Cookie Policy</h1>
+    <div class="pg-updated">Last updated September 2026</div>
+    <p class="pg-lead">APPIKA keeps cookie use minimal — just enough to make the store work smoothly.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">Why we use cookies</div>
+      <p class="pg-p">Cookies and similar local storage let the store remember short‑lived preferences as you browse — such as your last selected category or sort order — so the experience feels continuous as you move between apps.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Types of cookies</div>
+      <ul class="pg-list">
+        <li><strong style="color:var(--text)">Essential</strong> — required for the store's core pages and download flow to function.</li>
+        <li><strong style="color:var(--text)">Preference</strong> — remember display choices like sorting and language, purely for convenience.</li>
+      </ul>
+      <p class="pg-p">APPIKA does not use third‑party advertising or tracking cookies.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Managing cookies</div>
+      <p class="pg-p">You can clear or block cookies at any time from your browser settings. Since APPIKA's cookies are only used for convenience, blocking them won't prevent you from browsing or downloading apps.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ABOUT APPIKA ============ -->
+<div class="page-window" id="pg-about">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Legal</div>
+    <h1 class="pg-title">About APPIKA</h1>
+    <p class="pg-lead">APPIKA is a professional app store built and maintained by APPIKA‑Studio, bringing together mobile apps, desktop tools and games in one curated catalog.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">What we build</div>
+      <p class="pg-p">Every listing on APPIKA — mobile app, desktop app, Android game or HTML game — is crafted with the same attention to detail: a clear description, an accurate size and version, and a store page designed to help you decide quickly.</p>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Our approach</div>
+      <ul class="pg-list">
+        <li>Quality over quantity — the catalog stays curated rather than flooded.</li>
+        <li>Transparent ratings — every star comes from a real visitor review.</li>
+        <li>No clutter — no ads, no forced sign‑ups to download an app.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">The team</div>
+      <p class="pg-p">APPIKA‑Studio is a small, independent team focused on building useful, well‑made software — and giving it a home that feels as polished as the apps themselves.</p>
+      <a class="pg-link-btn" href="#contact">Get in touch →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HELP CENTER ============ -->
+<div class="page-window" id="pg-help">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Support</div>
+    <h1 class="pg-title">Help Center</h1>
+    <p class="pg-lead">Quick answers to the questions we hear most often about downloading, installing and reviewing apps on APPIKA.</p>
+
+    <div class="pg-section">
+      <div class="pg-faq">
+        <details open>
+          <summary>How do I download an app from APPIKA?</summary>
+          <div class="pg-p">Open any app's page and select <strong style="color:var(--text)">Download Now</strong>. The file starts downloading immediately — no account or sign‑up needed.</div>
+        </details>
+        <details>
+          <summary>Why won't an app install on my device?</summary>
+          <div class="pg-p">Check the app's listed category — mobile apps are built for Android/iOS, desktop apps for Windows/macOS, and HTML games run directly in your browser. Installing the wrong file type for your device is the most common cause.</div>
+        </details>
+        <details>
+          <summary>How are download counts and ratings calculated?</summary>
+          <div class="pg-p">Download counts increase each time a file is downloaded through the store, and the rating is the live average of every star rating submitted in that app's reviews.</div>
+        </details>
+        <details>
+          <summary>Can I leave a review without downloading first?</summary>
+          <div class="pg-p">Yes — the review form is open to anyone visiting the app's page. We do ask that reviews reflect real experience with the app.</div>
+        </details>
+        <details>
+          <summary>An app seems broken or unsafe — what should I do?</summary>
+          <div class="pg-p">Please use <a href="#report" style="color:var(--accent)">Report a Problem</a> so the APPIKA team can look into it right away.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Still stuck?</div>
+      <p class="pg-p">Reach the team directly and we'll help you sort it out.</p>
+      <a class="pg-link-btn" href="#contact">Contact Us →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONTACT US ============ -->
+<div class="page-window" id="pg-contact">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Support</div>
+    <h1 class="pg-title">Contact Us</h1>
+    <p class="pg-lead">Have a question, a suggestion, or just want to say hello? Here's how to reach APPIKA‑Studio.</p>
+
+    <div class="pg-contact-grid">
+      <div class="pg-contact-item">
+        <div class="lbl">General inquiries</div>
+        <a class="val" href="mailto:hello@APPIKA-studio.com">hello@APPIKA-studio.com</a>
+      </div>
+      <div class="pg-contact-item">
+        <div class="lbl">Support</div>
+        <a class="val" href="mailto:th5jhonny5@gmail.com">th5jhonny5@gmail.com</a>
+      </div>
+      <div class="pg-contact-item">
+        <div class="lbl">Response time</div>
+        <div class="val">Usually within 48 hours</div>
+      </div>
+      <div class="pg-contact-item">
+        <div class="lbl">Languages</div>
+        <div class="val">English · العربية · Français</div>
+      </div>
+    </div>
+
+    <div class="pg-section" style="margin-top:34px;">
+      <div class="pg-h3">Before you write in</div>
+      <ul class="pg-list">
+        <li>For app bugs or unsafe listings, use <a href="#report" style="color:var(--accent)">Report a Problem</a> instead — it reaches the right team faster.</li>
+        <li>For common questions, check the <a href="#help" style="color:var(--accent)">Help Center</a> first.</li>
+        <li>If you're a developer wanting to list an app, see the <a href="#developers" style="color:var(--accent)">Developers</a> page.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REPORT A PROBLEM ============ -->
+<div class="page-window" id="pg-report">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Support</div>
+    <h1 class="pg-title">Report a Problem</h1>
+    <p class="pg-lead">Found a bug, a broken download, or a listing that doesn't look right? Let us know and we'll investigate.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">What to include</div>
+      <ul class="pg-list">
+        <li>The app's name and category (mobile, desktop, Android game or HTML game).</li>
+        <li>What happened — a crash, a broken link, an incorrect description, or something else.</li>
+        <li>Your device and browser, if the issue is install‑related.</li>
+        <li>A screenshot, if you have one — it helps us reproduce the issue faster.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">What we take reports on</div>
+      <div class="pg-tag-row">
+        <span class="pg-tag">Broken downloads</span>
+        <span class="pg-tag">Crashes</span>
+        <span class="pg-tag">Incorrect listing info</span>
+        <span class="pg-tag">Inappropriate reviews</span>
+        <span class="pg-tag">Suspicious app behavior</span>
+        <span class="pg-tag">Copyright concerns</span>
+      </div>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Send your report</div>
+      <p class="pg-p">Email the details above to our support address and we'll follow up once we've looked into it.</p>
+      <a class="pg-link-btn" href="mailto:th5jhonny5@gmail.com">Email Support →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DEVELOPERS ============ -->
+<div class="page-window" id="pg-developers">
+  <div class="pg-body">
+    <div class="pg-eyebrow"><span class="dot"></span> Support</div>
+    <h1 class="pg-title">Developers</h1>
+    <p class="pg-lead">APPIKA‑Studio builds every app in the current catalog. Here's what it takes for outside developers to eventually get listed too.</p>
+
+    <div class="pg-section">
+      <div class="pg-h3">Listing standards</div>
+      <ul class="pg-list">
+        <li>The app must be complete, stable and free of intrusive ads or malware.</li>
+        <li>A clear icon, at least one screenshot, and an honest description are required.</li>
+        <li>Version and file size must stay accurate as the app is updated.</li>
+      </ul>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Supported categories</div>
+      <div class="pg-tag-row">
+        <span class="pg-tag">📱 Mobile Apps</span>
+        <span class="pg-tag">💻 Desktop Apps</span>
+        <span class="pg-tag">🎮 Android Games</span>
+        <span class="pg-tag">🌐 HTML Games</span>
+      </div>
+    </div>
+
+    <div class="pg-section">
+      <div class="pg-h3">Get in touch</div>
+      <p class="pg-p">Third‑party submissions aren't open yet — but if you'd like to be considered when they are, reach out and tell us about your app.</p>
+      <a class="pg-link-btn" href="mailto:hello@APPIKA-studio.com">Email APPIKA‑Studio →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const PAGE_TITLES = {
+  terms: 'Terms of Service',
+  privacy: 'Privacy Policy',
+  cookies: 'Cookie Policy',
+  about: 'About',
+  help: 'Help Center',
+  contact: 'Contact Us',
+  report: 'Report a Problem',
+  developers: 'Developers'
+};
+
+function showFromHash() {
+  const id = (location.hash || '').replace('#', '');
+  document.querySelectorAll('.page-window').forEach(el => el.classList.remove('active'));
+
+  if (id && PAGE_TITLES[id]) {
+    const target = document.getElementById('pg-' + id);
+    if (target) {
+      target.classList.add('active');
+      document.getElementById('crumb-current').textContent = '· ' + PAGE_TITLES[id];
+      document.title = PAGE_TITLES[id] + ' — APPIKA';
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
+  document.getElementById('hub').classList.add('active');
+  document.getElementById('crumb-current').textContent = '· Info Center';
+  document.title = 'APPIKA — Info Center';
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('hashchange', showFromHash);
+showFromHash();
+</script>
+</body>
+</html>

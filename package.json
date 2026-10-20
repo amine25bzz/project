@@ -1,0 +1,12 @@
+{
+  "name": "devstore",
+  "version": "1.0.0",
+  "description": "DevStore app store with automatic apps.json read/write",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
