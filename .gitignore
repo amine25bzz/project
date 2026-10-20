@@ -1,0 +1,18 @@
+# حزم Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ملفات البيئة السرية (لا ترفع إلى GitHub)
+.env
+.env.local
+.env.*.local
+
+# بيئة Vercel
+.vercel
+
+# سجلات وملفات النظام
+*.log
+.DS_Store
+Thumbs.db

@@ -4,9 +4,12 @@
   "description": "DevStore app store with automatic apps.json read/write",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "migrate": "node migrate.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "dotenv": "^18.0.8",
+    "express": "^4.19.2",
+    "mongodb": "^7.7.0"
   }
 }

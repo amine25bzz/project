@@ -891,7 +891,7 @@ async function saveToFile() {
     if (!res.ok) throw new Error(res.error || 'unknown error');
     return true;
   } catch (e) {
-    showToast('⚠️ تعذر الحفظ فـ apps.json — تأكد السيرفر شغال (node server.js)', 'error');
+    showToast('⚠️ تعذر حفظ البيانات — تأكد أن السيرفر شغال (node server.js)', 'error');
     return false;
   }
 }
